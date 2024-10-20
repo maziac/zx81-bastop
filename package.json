@@ -65,6 +65,11 @@
                 "category": "zx81-bastop.convert"
             },
             {
+                "command": "zx81-bastop.convertptobas",
+                "title": "Convert P-File to ZX81 BASIC",
+                "category": "zx81-bastop.convert"
+            },
+            {
                 "command": "zx81-bastop.convertbastop",
                 "title": "Convert ZX81 BASIC to P-File",
                 "category": "zx81-bastop.convert"

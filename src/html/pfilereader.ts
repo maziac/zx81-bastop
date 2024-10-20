@@ -108,7 +108,22 @@ export function parsePfile() {
 	const btnSaveBasicAs = document.createElement('button');
 	btnSaveBasicAs.classList.add('btn-basic');
 	btnSaveBasicAs.textContent = 'Save BASIC as...';
-	btnSaveBasicAs.onclick = () => vscode.postMessage({ command: 'saveBasicAs' });
+	btnSaveBasicAs.onclick = () => vscode.postMessage({command: 'saveBasicAs'});
+
+	// Create checkbox for "Bracketized Tokens"
+	const hoverText = 'Will surround all ZX81 BASIC tokens with brackets, e.g. "[PRINT]". If you encounter problems with converting the BASIC back to a P-file, try this option.';
+	const chkBracketizedTokens = document.createElement('input');
+	chkBracketizedTokens.type = 'checkbox';
+	chkBracketizedTokens.id = 'chkBracketizedTokens';
+	chkBracketizedTokens.title = hoverText;
+	const lblBracketizedTokens = document.createElement('label');
+	lblBracketizedTokens.htmlFor = 'chkBracketizedTokens';
+	lblBracketizedTokens.textContent = 'Bracketized Tokens';
+	lblBracketizedTokens.title = hoverText;
+
+	// Append checkbox and label to the start of the webview
+	document.body.insertBefore(lblBracketizedTokens, document.body.firstChild);
+	document.body.insertBefore(chkBracketizedTokens, document.body.firstChild);
 
 	// Append buttons to the start of the webview
 	document.body.insertBefore(btnCopyBasic, document.body.firstChild);
