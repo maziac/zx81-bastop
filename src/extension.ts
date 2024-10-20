@@ -24,6 +24,11 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     // Command to convert a ZX81 BASIC text file into a P-file.
+    context.subscriptions.push(vscode.commands.registerCommand('zx81-bastop.convertptobas', async uri => {
+        // TODO
+    }));
+
+    // Command to convert a ZX81 BASIC text file into a P-file.
     context.subscriptions.push(vscode.commands.registerCommand('zx81-bastop.convertbastop', async uri => {
         // Clear diagnostics
         Diagnostics.clearDiagnostics();

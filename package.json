@@ -46,7 +46,7 @@
                 "displayName": "P-File Viewer",
                 "selector": [
                     {
-                        "filenamePattern": "*.{p,p81,o,P,P81,O}"
+                        "filenamePattern": "*.{p,p81,o,P,P81,O,bas,BAS}"
                     }
                 ],
                 "priority": "option"
@@ -61,13 +61,13 @@
         "commands": [
             {
                 "command": "zx81-bastop.open",
-                "title": "Open with 'ZX81 P-File Viewer'",
-                "category": "P-File Viewer"
+                "title": "Open ZX81 P-File",
+                "category": "zx81-bastop.convert"
             },
             {
                 "command": "zx81-bastop.convertbastop",
-                "title": "Convert .bas to .p",
-                "category": "P-File Viewer"
+                "title": "Convert ZX81 BASIC to P-File",
+                "category": "zx81-bastop.convert"
             }
         ],
         "menus": {
@@ -80,10 +80,16 @@
             "explorer/context": [
                 {
                     "group": "navigation",
-                    "command": "zx81-bastop.open"
+                    "command": "zx81-bastop.open",
+                    "when": "resourceExtname == .p || resourceExtname == .p81 || resourceExtname == .o || resourceExtname == .P || resourceExtname == .P81 || resourceExtname == .O"
                 },
                 {
-                    "group": "zx81-bastop.convert",
+                    "group": "navigation",
+                    "command": "zx81-bastop.convertptobas",
+                    "when": "resourceExtname == .p || resourceExtname == .p81 || resourceExtname == .o || resourceExtname == .P || resourceExtname == .P81 || resourceExtname == .O"
+                },
+                {
+                    "group": "navigation",
                     "command": "zx81-bastop.convertbastop",
                     "when": "resourceExtname == .bas || resourceExtname == .BAS"
                 }

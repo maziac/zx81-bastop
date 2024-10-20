@@ -1,6 +1,5 @@
 import {vscode} from './vscode-import';
 import {read, setOffset, getOffset, setEndianness, getNumberValue, getHex0xValue, getDecimalValue, getData, getRemainingSize} from './dataread';
-
 import {addRow, addDetails, addMemDump} from './parser';
 import {addCanvas} from './canvas';
 import {addTextBox} from './textbox';
