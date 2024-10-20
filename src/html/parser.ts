@@ -18,6 +18,9 @@ let filePathParser: string;
 // The current row's cell that contains the collapsible icon (+)
 let lastCollapsibleNode: HTMLTableCellElement;
 
+// Contains the file path of the binary file to parse.
+let binFilePath: string;
+
 // The current row's cell that contains the value. Can be used to
 // add a value later.
 let lastValueNode: HTMLTableCellElement;
