@@ -14,8 +14,10 @@ export class Zx81PfileToBas {
 	 * 2    Length of of following bytes in line (incl $76). little endian.
 	 * n    The BASIC tokens.
 	 * 1	0x76 (END token, Newline)
+	 * @param buffer The data of the BASIC program. (Just a part of the p-file.)
+	 * @param bracketized If true then tokens are put in brackets.
 	 */
-	public static getZx81BasicText(buffer: Uint8Array): string {
+	public static getZx81BasicText(buffer: Uint8Array, bracketized = false): string {
 		let remaining = buffer.length;
 		let txt = '';
 		let index = 0;
@@ -60,8 +62,9 @@ export class Zx81PfileToBas {
 
 					// Get token
 					let cvt = this.convertToken(token);
+
 					// If REM or quoted then add brackets to commands
-					if ((rem || quoted) && ((token >= 0xC1 && token !== 0xC3) || (token >= 0x40 && token <= 0x42)))
+					if ((bracketized || rem || quoted) && ((token >= 0xC1 && token !== 0xC3) || (token >= 0x40 && token <= 0x42)))
 						cvt = '[' + cvt.trim() + ']';
 					txt += cvt;
 

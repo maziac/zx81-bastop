@@ -84,6 +84,8 @@ export class Zx81BasToPfile {
 			this.normalMap.set(key, i);
 			if ((i >= 0xC1 && i !== 0xC3) || (i >= 0x40 && i <= 0x42)) {
 				key = '[' + key.trim() + ']';
+				// Allow bracketized form to be recognized as well
+				this.normalMap.set(key, i);
 			}
 			this.remQuotedMap.set(key, i);
 		}

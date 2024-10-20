@@ -132,6 +132,7 @@ How it works:
 
 Important things to note:
 - \, % and [ are characters that do not exist in the ZX81 charset.
+- `#` is used for comments and for the ZX81 pound sign.
 - Spaces at the end of a line are ignored. So, a p-file converted to .bas and back to p-file can have a different size. The p-file converter will add spaces if the original has spaces but an editor might cut them off anyway.
 - In REM-lines all codes will have a translation. Spaces at the end of a line are relevant. Therefore the p-file converter converts the last space as "[0]" to prevent that an editor cuts them off.
 - The tokens are checked with the longest tokens first. This is to prevent that e.g. "<>" is not recognized as "<" and ">" but as a single code.

@@ -1204,6 +1204,29 @@ describe('Zx81BasToPfile', () => {
 				});
 			});
 		});
+
+		describe('bracketized', () => {
+			it('[IF][INKEY$]=""[THEN][GOTO]120', () => {
+				const conv = new Zx81BasToPfile('120 [IF][INKEY$]=""[THEN][GOTO]120') as any;
+				conv.encodeBasic();
+				const buf = conv.basicCodeOut;
+				assert.deepEqual(buf.slice(0,4+17-7), [
+					0, 120,	// Line number
+					17, 0,	// Size
+					0xFA,	// [IF]
+					0x41,	// [INKEY$]
+					0x14,	// =
+					0x0B,	// \"
+					0x0B,	// \"
+					0xDE,	// [THEN]
+					0xEC,	// [GOTO]
+					0x1D,	// 1
+					0x1E,	// 2
+					0x1C,	// 0
+					// Rest (1+5 number + newline) skipped
+				]);
+			});
+		});
 	});
 
 	describe('createPfile', () => {
@@ -1496,5 +1519,4 @@ describe('Zx81BasToPfile', () => {
 			assert.equal(conv.eos(), false);
 		});
 	});
-
 });

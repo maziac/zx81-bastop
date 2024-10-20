@@ -174,8 +174,7 @@ export class EditorDocument implements vscode.CustomDocument {
 	protected sendParserToWebView() {
 		// Send the parser to the webview
 		const message = {
-			command: 'setParser',	// TODO: RENAME
-			//parser: this.parser, // TODO: REMOVE
+			command: 'setParser',
 			binFilePath: this.uri.fsPath
 		};
 		this.webviewPanel.webview.postMessage(message);
@@ -227,6 +226,7 @@ export class EditorDocument implements vscode.CustomDocument {
 	 * conversion was (partly) unsuccessful.
 	 */
 	protected getBasicText(data: Uint8Array): string {
+		const bracketized = true;
 		// Extract the start to end of the BASIC program
 		const offsDFile = 0x400C - 0x4009;
 		const dfile_ptr = data[offsDFile] + data[offsDFile + 1] * 256;
@@ -234,7 +234,7 @@ export class EditorDocument implements vscode.CustomDocument {
 		const end = dfile_ptr - 0x4009;
 		const basicCode = data.slice(start, end);
 		// Convert to text
-		let basicTxt = Zx81PfileToBas.getZx81BasicText(basicCode);
+		let basicTxt = Zx81PfileToBas.getZx81BasicText(basicCode, bracketized);
 		// Some p-files have BASIC lines inside the dfile area.
 		// (Often 1k programs to save memory.)
 		const offsNXTLIN = 0x4029 - 0x4009;
@@ -244,7 +244,7 @@ export class EditorDocument implements vscode.CustomDocument {
 			// anyhow, try to parse it.
 			const startNXTLIN = NXTLIN - 0x4009;
 			const basicOutside = data.slice(startNXTLIN);
-			const basicTxtOutside = Zx81PfileToBas.getZx81BasicText(basicOutside);
+			const basicTxtOutside = Zx81PfileToBas.getZx81BasicText(basicOutside, bracketized);
 			basicTxt += '\n\n BASIC program outside BASIC area at 0x' + Utility.getHexString(NXTLIN, 4) + ':\n' + basicTxtOutside;
 		}
 		return basicTxt;
