@@ -1,0 +1,13 @@
+.*/
+/node_modules/
+/out/
+*.log
+logs/
+/*.vsix
+*.zip
+*.map
+coverage/
+notes.md
+/examples/parsers/tests/
+/trash/
+

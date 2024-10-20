@@ -1,0 +1,156 @@
+* {
+    font-family: var(--vscode-editor-font-family);
+    font-weight: var(--vscode-editor-font-weight);
+    font-size: var(--vscode-editor-font-size);
+}
+
+title {
+	font-weight: bold;
+}
+
+a.tip {
+	font-weight: bold;
+}
+
+
+/* Alternating colors for table rows. */
+tr:nth-child(even) {
+    background-color: var(--vscode-editorIndentGuide-background);
+}
+tr:nth-child(odd) {
+    background-color: var(--vscode-badge-background);
+}
+
+/* Left align table headers. */
+th {
+	text-align: left;
+	vertical-align: top;
+	padding: 0.25em;
+	font-weight: bold;
+	background-color: var(--vscode-badge-background);
+}
+
+/* Table cells */
+td {
+	text-align: left;
+	vertical-align: top;
+	overflow-wrap: break-word;
+	padding: 0.25em;
+}
+
+/* Class for the embedded table */
+.embeddedtable {
+	background-color: var(--vscode-editorWidget-background);
+}
+
+/* Class for the collapse icon */
+.collapse {
+	min-width: 1em;
+	text-align: right;
+	color: var(--vscode-terminal-ansiYellow);
+	cursor: pointer;
+}
+
+/* Class for the offset */
+.offset {
+	min-width: 4em;
+	max-width: 10vw;
+	text-align: right;
+	color: var(--vscode-terminal-ansiYellow);
+}
+
+/* Class for the size */
+.size {
+	min-width: 3em;
+	max-width: 10vw;
+	text-align: right;
+	color: var(--vscode-terminal-ansiMagenta);
+}
+
+/* Class for the name */
+.name {
+	min-width: 3em;
+	max-width: 20vw;
+	font-weight: bold;
+	/* color: var(--vscode-terminal-ansiBrightWhite) */
+	color: var(--vscode-terminal-ansiBrightBlue);
+}
+
+/* Class for the value */
+.value {
+	min-width: 4em;
+	max-width: 20vw;
+	font-weight: bold;
+	color: var(--vscode-terminal-ansiGreen);
+}
+
+/* Class for the description */
+.description {
+	min-width: 50vw; /*4em;
+	max-width: 50vw;*/
+	/*width: 50vw;*/
+	/* padding-left: 1.5em; */
+	color: var(--vscode-terminal-ansiWhite);
+}
+
+
+/* One mem dump byte. */
+.mem_byte {
+  	display: inline-block;
+  	width: 1.5em;
+  	text-align: center;
+	padding: 0;
+	/*padding-left: 0.25em;*/
+}
+
+/* Context menu */
+.context-menu {position: fixed;
+	color: var(--vscode-menu-foreground);
+	background: var(--vscode-menu-background);
+	border: 1px solid var(--vscode-menu-border);
+	box-shadow: 0 2px 4px var(--vscode-widget-shadow);
+	display: none;
+	z-index: 1000;
+	padding: 5px;
+	border-radius: 3px;
+	min-width: 50px;
+}
+
+.context-menu.visible {
+	display: block;
+}
+
+.context-menu-item {
+	padding: 8px 12px;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.context-menu-item:hover {
+	background-color: var(--vscode-menu-selectionBackground);
+	color: var(--vscode-menu-selectionForeground);
+}
+
+.context-menu-item.hidden {
+	display: none;
+}
+
+
+.btn-basic {
+	background-color: var(--vscode-button-background);
+	color: var(--vscode-button-foreground);
+	border: none;
+	padding: 5px 10px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.1s ease;
+	margin-right: 10px;
+}
+
+.btn-basic:hover {
+	background-color: var(--vscode-button-hoverBackground);
+}
+
+.btn-basic:active {
+	background-color: var(--vscode-focusBorder);
+}
