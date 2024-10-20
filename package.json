@@ -1,0 +1,123 @@
+{
+    "name": "zx81-bastop",
+    "displayName": "A ZX81 BASIC to P-File converter and a viewer for P-Files",
+    "description": "The extension does 2 things: A) It can convert ZX81 .bas files containing ZX81 BASIC into .p files and B) it is a viewer for ZX81 p-file contents. Showing the BASIC program and the screen (dfile) contents. It can view .P, .O and .P81 files. It can also extract the BASIC program from the file as text.",
+    "version": "1.0.0-rc2",
+    "publisher": "maziac",
+    "author": {
+        "name": "Thomas Busse"
+    },
+    "license": "MIT",
+    "keywords": [
+        "zx81",
+        "viewer",
+        "basic",
+        "converter",
+        "p-file"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/maziac/zx81-bastop"
+    },
+    "sponsor": {
+        "url": "https://github.com/sponsors/maziac"
+    },
+    "engines": {
+        "vscode": ">=1.75.0"
+    },
+    "icon": "assets/local/icon.png",
+    "categories": [
+        "Visualization",
+        "Programming Languages"
+    ],
+    "activationEvents": [
+        "onLanguage:javascript"
+    ],
+    "capabilities": {
+        "untrustedWorkspaces": {
+            "supported": true
+        }
+    },
+    "main": "./out/extension",
+    "contributes": {
+        "customEditors": [
+            {
+                "viewType": "zx81-bastop.viewer",
+                "displayName": "P-File Viewer",
+                "selector": [
+                    {
+                        "filenamePattern": "*.{p,p81,o,P,P81,O}"
+                    }
+                ],
+                "priority": "option"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "zx81-bastop configuration",
+            "properties": {
+            }
+        },
+        "commands": [
+            {
+                "command": "zx81-bastop.open",
+                "title": "Open with 'ZX81 P-File Viewer'",
+                "category": "P-File Viewer"
+            },
+            {
+                "command": "zx81-bastop.convertbastop",
+                "title": "Convert .bas to .p",
+                "category": "P-File Viewer"
+            }
+        ],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "zx81-bastop.open",
+                    "when": "false"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "group": "navigation",
+                    "command": "zx81-bastop.open"
+                },
+                {
+                    "group": "zx81-bastop.convert",
+                    "command": "zx81-bastop.convertbastop",
+                    "when": "resourceExtname == .bas || resourceExtname == .BAS"
+                }
+            ],
+            "editor/context": [
+                {
+                    "group": "zx81-bastop.convert",
+                    "command": "zx81-bastop.convertbastop",
+                    "when": "resourceExtname == .bas || resourceExtname == .BAS"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "watch-tsc": "tsc -w -p ./",
+        "test": "mocha -u bdd ./out/tests/",
+        "vscode:prepublish": "npm run esbuild-node -- --minify && npm run esbuild-browser -- --minify",
+        "esbuild-node": "esbuild ./src/extension.ts --bundle --outdir=out --external:vscode --format=cjs --platform=node",
+        "esbuild-browser": "esbuild ./src/html/parser.ts --bundle --outdir=out/html --platform=browser",
+        "watch-node": "npm run esbuild-node -- --sourcemap --watch",
+        "watch-browser": "npm run esbuild-browser -- --sourcemap --watch",
+        "package": "vsce package"
+    },
+    "dependencies": {
+        "path": "^0.12.7"
+    },
+    "devDependencies": {
+        "@types/node": "^20.11.30",
+        "@types/vscode": "^1.75.0",
+        "@types/vscode-webview": "^1.57.5",
+        "esbuild": "^0.20.2",
+        "@types/mocha": "10.0.6",
+        "mocha": "^10.4.0",
+        "source-map-support": "^0.5.21",
+        "typescript": "^5.4.3"
+    }
+}
