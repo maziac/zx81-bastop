@@ -1,6 +1,6 @@
 import {vscode} from './vscode-import';
 import {dataBuffer, lastOffset, lastSize, lastBitOffset, lastBitSize, startOffset, getDataBufferSize, getRelOffset, convertToHexString, correctBitByteOffsets, setLastOffset, setLastSize, setLastBitOffset, setLastBitSize, setStartOffset, setLittleEndian, read, readUntil, setOffset, getOffset, readBits, setEndianness, getNumberValue, getSignedNumberValue, getFloatNumberValue, getBitsValue, getHexValue, getHex0xValue, getDecimalValue, getSignedDecimalValue, getStringValue, getData, endOfFile, getRemainingSize, setDataBuffer} from './dataread';
-import {parsePfile, setTextData} from './pfilereader';
+import {parsePfile, setTextData, isBracketizedTokensEnabled} from './pfilereader';
 
 /**
  * This js script parses a file, does all the decoding and presents the
@@ -758,22 +758,17 @@ contextMenuItemSaveAs.addEventListener('click', async function () {
 		return;
 
 	let ext = 'txt';
-	if (data instanceof Blob) {
-		// Save image
-		data = await data.arrayBuffer();
-		ext = 'png';
-	}
-	else {
-		// Check if origin was the BASIC text
-		if (contextMenuTarget && contextMenuTarget.classList.contains('ZX81BASIC'))
-			ext = 'bas';
-	}
+	if (!(data instanceof Blob))
+		return;
+
+	// Save image
+	const pngData = await data.arrayBuffer();
 
 	// Post message to vscode
 	vscode.postMessage({
 		command: 'saveas',
-		data,
-		ext
+		data: pngData,
+		ext: 'png'
 	});
 
 	contextMenu.classList.remove('visible');

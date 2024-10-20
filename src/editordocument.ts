@@ -79,24 +79,16 @@ export class EditorDocument implements vscode.CustomDocument {
 						break;
 					case 'saveas':
 						// Save text or image to file
-						const data = message.data;
 						const ext = message.ext;
-						const options: vscode.SaveDialogOptions = {
-							saveLabel: 'Save',
-							defaultUri: vscode.Uri.file(filePath + '.' + ext)
-						};
-						if (ext === 'png')
-							options.filters = {'Images': [ext]};
-						else
-							options.filters = {'Text Files': [ext]};
-						const uri = await vscode.window.showSaveDialog(options);
-						if (uri) {
-							if (typeof data === 'string') {
-								fs.writeFileSync(uri.fsPath, data, 'utf8');
-								const txt = (ext === 'bas') ? 'ZX81 BASIC program' : 'Text';
-								vscode.window.showInformationMessage(`${txt} saved to ${uri.fsPath}`);
-							}
-							else {
+						if (ext === 'png') {
+							const data = message.data;
+							const options: vscode.SaveDialogOptions = {
+								saveLabel: 'Save',
+								defaultUri: vscode.Uri.file(filePath + '.' + ext),
+								filters: {'Images': [ext]}
+							};
+							const uri = await vscode.window.showSaveDialog(options);
+							if (uri) {
 								const buffer = Buffer.from(data);
 								fs.writeFileSync(uri.fsPath, buffer);
 								vscode.window.showInformationMessage(`Image saved to ${uri.fsPath}`);
@@ -108,7 +100,8 @@ export class EditorDocument implements vscode.CustomDocument {
 							// Read file
 							const [data, offset] = this.getPfileData(filePath);
 							// Get BASIC text
-							const basicText = this.getCommentHeaderAndBasicText(data.slice(offset));
+							const brackets = message.brackets;
+							const basicText = this.getCommentHeaderAndBasicText(data.slice(offset), brackets);
 							// Copy BASIC text to clipboard
 							vscode.env.clipboard.writeText(basicText);
 							vscode.window.showInformationMessage('ZX81 BASIC text copied to clipboard.');
@@ -119,7 +112,8 @@ export class EditorDocument implements vscode.CustomDocument {
 							// Read file
 							const [data, offset] = this.getPfileData(filePath);
 							// Get BASIC text
-							const basicText = this.getCommentHeaderAndBasicText(data.slice(offset));
+							const brackets = message.brackets;
+							const basicText = this.getCommentHeaderAndBasicText(data.slice(offset), brackets);
 							// Save BASIC text to a file
 							const saveOptions: vscode.SaveDialogOptions = {
 								saveLabel: 'Save BASIC As',
@@ -189,7 +183,7 @@ export class EditorDocument implements vscode.CustomDocument {
 		// Read file
 		const [data, offset, zx81Filename] = this.getPfileData(filePath);
 		// Get BASIC text
-		const basicTxt = this.getBasicText(data.slice(offset));
+		const basicTxt = this.getBasicText(data.slice(offset), false);
 		// Send data to webview
 		this.sendDataToWebView(data, offset, zx81Filename, basicTxt);
 		// Start parser
@@ -200,6 +194,7 @@ export class EditorDocument implements vscode.CustomDocument {
 	/** If file is a p81 file it reads the name, returns it and also returns the rest of
 	 * data (sliced).
 	 * Otherwise the data is directly read from the file and returned.
+	 * @param filePath The path to the file.
 	 * @returns [data, offset, zx81Filename] The data and it's offset to the filename and the filename.
 	 * If no p81 file then zx81Filename is undefined.
 	 */
@@ -222,11 +217,12 @@ export class EditorDocument implements vscode.CustomDocument {
 
 	/** Returns the BASIC text from the ZX81 p-file.
 	 * @param data The p-file data.
+	 * @param bracketized If true then the tokens are surrounded by brackets.
+	 * E.g. PRINT -> [PRINT]
 	 * @returns The BASIC text. Can include error text if the
 	 * conversion was (partly) unsuccessful.
 	 */
-	protected getBasicText(data: Uint8Array): string {
-		const bracketized = true;
+	protected getBasicText(data: Uint8Array, bracketized: boolean): string {
 		// Extract the start to end of the BASIC program
 		const offsDFile = 0x400C - 0x4009;
 		const dfile_ptr = data[offsDFile] + data[offsDFile + 1] * 256;
@@ -253,13 +249,15 @@ export class EditorDocument implements vscode.CustomDocument {
 
 	/** Returns the comment header + BASIC text from the ZX81 p-file.
 	 * @param data The p-file data.
+	 * @param bracketized If true then the tokens are surrounded by brackets.
+	 * E.g. PRINT -> [PRINT]
 	 * @returns The comment header + BASIC text.
 	 */
-	protected getCommentHeaderAndBasicText(data: Uint8Array): string {
+	protected getCommentHeaderAndBasicText(data: Uint8Array, bracketized: boolean): string {
 		// Comment header
 		let txt = Zx81PfileToBas.getCommentHeader(data);
 		// BASIC
-		txt += this.getBasicText(data);
+		txt += this.getBasicText(data, bracketized);
 		return txt;
 	}
 

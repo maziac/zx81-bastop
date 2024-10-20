@@ -5,6 +5,9 @@ import {addCanvas} from './canvas';
 import {addTextBox} from './textbox';
 
 
+// Checkbox: "Bracketized Tokens"
+export let isBracketizedTokensEnabled = false;
+
 // Screen height
 const SCREEN_HEIGHT = 192;
 
@@ -103,12 +106,18 @@ export function parsePfile() {
 	const btnCopyBasic = document.createElement('button');
 	btnCopyBasic.classList.add('btn-basic');
 	btnCopyBasic.textContent = 'Copy BASIC to clipboard';
-	btnCopyBasic.onclick = () => vscode.postMessage({ command: 'copyBasic' });
+	btnCopyBasic.onclick = () => vscode.postMessage({
+		command: 'copyBasic',
+		brackets: isBracketizedTokensEnabled
+	});
 
 	const btnSaveBasicAs = document.createElement('button');
 	btnSaveBasicAs.classList.add('btn-basic');
 	btnSaveBasicAs.textContent = 'Save BASIC as...';
-	btnSaveBasicAs.onclick = () => vscode.postMessage({command: 'saveBasicAs'});
+	btnSaveBasicAs.onclick = () => vscode.postMessage({
+		command: 'saveBasicAs',
+		brackets: isBracketizedTokensEnabled
+	});
 
 	// Create checkbox for "Bracketized Tokens"
 	const hoverText = 'Will surround all ZX81 BASIC tokens with brackets, e.g. "[PRINT]". If you encounter problems with converting the BASIC back to a P-file, try this option.';
@@ -116,6 +125,10 @@ export function parsePfile() {
 	chkBracketizedTokens.type = 'checkbox';
 	chkBracketizedTokens.id = 'chkBracketizedTokens';
 	chkBracketizedTokens.title = hoverText;
+	isBracketizedTokensEnabled = false;
+	chkBracketizedTokens.onchange = () => {
+		isBracketizedTokensEnabled = chkBracketizedTokens.checked;
+	};
 	const lblBracketizedTokens = document.createElement('label');
 	lblBracketizedTokens.htmlFor = 'chkBracketizedTokens';
 	lblBracketizedTokens.textContent = 'Bracketized Tokens';
