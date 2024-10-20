@@ -12,15 +12,8 @@ import {parsePfile, setTextData} from './pfilereader';
  */
 
 
-
-// The custom parser (js program as a string).
-let customParser: string;
-
 // The file path of the custom parser.
 let filePathParser: string;
-
-// Contains the file path of the binary file to parse.
-let binFilePath: string;
 
 // The current row's cell that contains the collapsible icon (+)
 let lastCollapsibleNode: HTMLTableCellElement;
