@@ -35,16 +35,16 @@ export class Zx81BasToPfile {
 	protected regexSpaces = /[ \t]+/y;
 
 	// Regex for a number (float).
-	protected regexNumber = /\d*(\.\d+)?(E[+-]?\d+)?/y
+	protected regexNumber = /\d*(\.\d+)?(E[+-]?\d+)?/iy
 
 	// Regex for an int.
 	protected regexInt = /\d+/y
 
 	// Regex for special codes e.g. [#size=100], [#include folder/file.obj] or a simple number [123].
-	protected specialCodeRegex = /\[(#.*?|\d+|!block\s*=\s*(\d+)\s*|!include\s+([\w.\/]+)\s*)\]/y;
+	protected specialCodeRegex = /\[(#.*?|\d+|!block\s*=\s*(\d+)\s*|!include\s+([\w.\/]+)\s*)\]/iy;
 
 	// Regex for the comment header #! (for BASIC start line)
-	protected commentHdrRegex = /#![ \t]*(basic-start[ \t]*(=)?[ \t]*|dfile-collapsed\b|dfile:|basic-vars:[ \t]*|.*)?/yi;
+	protected commentHdrRegex = /#![ \t]*(basic-start[ \t]*(=)?[ \t]*|dfile-collapsed\b|dfile:|basic-vars:[ \t]*|.*)?/iy;
 
 	// During encodeBasic() this buffer is filled with the basic code.
 	public basicCodeOut: number[] = [];
@@ -80,7 +80,7 @@ export class Zx81BasToPfile {
 
 		// Create map for REM and quoted strings decoding
 		for (let i = 0; i < Zx81Tokens.tokens.length; i++) {
-			let key = this.convertToken(i);
+			let key = Zx81Tokens.convertToken(i);
 			this.normalMap.set(key, i);
 			if ((i >= 0xC1 && i !== 0xC3) || (i >= 0x40 && i <= 0x42)) {
 				key = '[' + key.trim() + ']';
@@ -122,22 +122,6 @@ export class Zx81BasToPfile {
 		regexStr = '(' + regexStr + ')';
 		const regex= new RegExp(regexStr, 'y');
 		return regex;
-	}
-
-
-	// Converts one ZX81 character/token into text.
-	protected convertToken(tokenNumber: number): string {
-		let txt = '';
-		// Negativ/inverse "-., 0-9, A-Z
-		if (tokenNumber >= 0x8B && tokenNumber <= 0xBF) {
-			txt += '%';	// Inverse
-		}
-		// Use table
-		txt += Zx81Tokens.tokens[tokenNumber]; //.trimStart();
-		// If not defined then use token in square brackets.
-		if (!txt)
-			txt = '[' + tokenNumber + ']';
-		return txt;
 	}
 
 

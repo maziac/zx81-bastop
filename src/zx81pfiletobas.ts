@@ -61,7 +61,7 @@ export class Zx81PfileToBas {
 					}
 
 					// Get token
-					let cvt = this.convertToken(token);
+					let cvt = Zx81Tokens.convertToken(token);
 
 					// If REM or quoted then add brackets to commands
 					if ((bracketized || rem || quoted) && ((token >= 0xC1 && token !== 0xC3) || (token >= 0x40 && token <= 0x42)))
@@ -160,7 +160,7 @@ export class Zx81PfileToBas {
 				continue;
 			}
 			// Convert to ASCII
-			const charAscii = this.convertToken(code);
+			const charAscii = Zx81Tokens.convertToken(code);
 			dfileLines += charAscii;
 			nextLineStarted = false;
 			if(code !== 0)
@@ -191,22 +191,6 @@ export class Zx81PfileToBas {
 		}
 
 		return hdr;
-	}
-
-
-	/** Converts one ZX81 character/token into text. */
-	public static convertToken(tokenNumber: number): string {
-		let txt = '';
-		// Negativ/inverse "-., 0-9, A-Z
-		if (tokenNumber >= 0x8B && tokenNumber <= 0xBF) {
-			txt += '%';	// Inverse
-		}
-		// Use table
-		txt += Zx81Tokens.tokens[tokenNumber];
-		// If not defined then use token in square brackets.
-		if (!txt)
-			txt = '[' + tokenNumber + ']';
-		return txt;
 	}
 
 
@@ -281,7 +265,7 @@ export class Zx81PfileToBas {
 		for (let i = 0; i < nameMax; i++) {
 			const c = data[i];
 			// Convert to ASCII
-			const charAscii = Zx81PfileToBas.convertToken(c & 0x7F);
+			const charAscii = Zx81Tokens.convertToken(c & 0x7F);
 			zx81Filename += charAscii;
 			nameLen++;
 			if (c >= 0x80)

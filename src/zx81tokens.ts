@@ -67,4 +67,20 @@ export class Zx81Tokens {
 		"NEW ", "SCROLL ", "CONT ", "REM ", "LIST ", "PRINT ",
 		"RUN ", "RAND ", "CLS ", "CLEAR ", "RETURN ", "COPY "
 	];
+
+
+	/** Converts one ZX81 character/token into text. */
+	public static convertToken(tokenNumber: number): string {
+		let txt = '';
+		// Negativ/inverse "-., 0-9, A-Z
+		if (tokenNumber >= 0x8B && tokenNumber <= 0xBF) {
+			txt += '%';	// Inverse
+		}
+		// Use table
+		txt += Zx81Tokens.tokens[tokenNumber];
+		// If not defined then use token in square brackets.
+		if (!txt)
+			txt = '[' + tokenNumber + ']';
+		return txt;
+	}
 }
