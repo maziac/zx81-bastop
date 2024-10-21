@@ -94,6 +94,16 @@ export class Zx81BasToPfile {
 	}
 
 
+	// Functions that return the map's value.
+	// Regardless of the case of the token.
+	protected normalMapGet(token: string): number {
+		return this.normalMap.get(token.toUpperCase())!;
+	}
+	protected remQuotedMapGet(token: string): number {
+		return this.remQuotedMap.get(token.toUpperCase())!;
+	}
+
+
 	// Creates a regex from the tokens.
 	protected createRegex(tokens: string[]): RegExp {
 		const sorted = tokens.sort((a, b) => b.length - a.length);
@@ -120,7 +130,7 @@ export class Zx81BasToPfile {
 		})
 		let regexStr = replaced.join('|');
 		regexStr = '(' + regexStr + ')';
-		const regex= new RegExp(regexStr, 'y');
+		const regex= new RegExp(regexStr, 'iy');
 		return regex;
 	}
 
@@ -144,7 +154,7 @@ export class Zx81BasToPfile {
 		const buffer: number[] = [];
 		for (let char of numberStr) {
 			// Each character one by one
-			const zx81Char = this.normalMap.get(char)!;
+			const zx81Char = this.normalMapGet(char)!;
 			buffer.push(zx81Char);
 		}
 
@@ -264,7 +274,7 @@ export class Zx81BasToPfile {
 			// Else
 			this.throwError('Token unknown.');
 		}
-		const tokenNumber = this.remQuotedMap.get(token)!;
+		const tokenNumber = this.remQuotedMapGet(token)!;
 		return [tokenNumber];
 	}
 
@@ -305,7 +315,7 @@ export class Zx81BasToPfile {
 			if (!token)
 				this.throwError('Parse error.');
 			// Add to buffer
-			const tokenNumber = this.normalMap.get(token)!;
+			const tokenNumber = this.normalMapGet(token)!;
 			buffer.push(tokenNumber);
 		}
 
@@ -661,7 +671,7 @@ export class Zx81BasToPfile {
 			const token = this.readToken(this.normalRegex);
 			if (!token)
 				this.throwError("Unknown command");
-			const tokenNumber = this.normalMap.get(token)!;
+			const tokenNumber = this.normalMapGet(token)!;
 			this.basicCodeOut.push(tokenNumber);
 			if (tokenNumber === Zx81Tokens.REM) {
 				// REM

@@ -29,10 +29,10 @@ describe('Zx81BasToPfile', () => {
 
 		it('createRegex', () => {
 			const conv = new Zx81BasToPfile("") as any;
-			assert.equal(conv.createRegex(["abc"]).toString(), '/(abc)/y');
-			assert.equal(conv.createRegex(["a", "bc"]).toString(), '/(bc|a)/y');
-			assert.equal(conv.createRegex(["[123]", "[PLOT]"]).toString(), '/(\\[PLOT\\]|\\[123\\])/y');
-			assert.equal(conv.createRegex(["PLOT"]).toString(), '/(PLOT)/y');
+			assert.equal(conv.createRegex(["abc"]).toString(), '/(abc)/iy');
+			assert.equal(conv.createRegex(["a", "bc"]).toString(), '/(bc|a)/iy');
+			assert.equal(conv.createRegex(["[123]", "[PLOT]"]).toString(), '/(\\[PLOT\\]|\\[123\\])/iy');
+			assert.equal(conv.createRegex(["PLOT"]).toString(), '/(PLOT)/iy');
 		});
 	});
 
