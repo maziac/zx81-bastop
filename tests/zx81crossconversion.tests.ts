@@ -394,10 +394,7 @@ describe('Zx81 Cross Conversion', () => {
 			const txt = (Zx81PfileToBas as any).getCommentHeader(pfile);
 			assert.ok(!txt.includes('#!basic-start'));
 			assert.ok(!txt.includes('#!basic-vars:'));
-			assert.ok(txt.includes('#!dfile:'));
-			// Count occurrences of '#!dfile:'
-			const dfileCount = (txt.match(/#!dfile:/g) || []).length;
-			assert.equal(dfileCount, 24);
+			assert.ok(!txt.includes('#!dfile:'));
 		});
 
 		it('BASIC prgm with line', () => {
@@ -428,5 +425,20 @@ describe('Zx81 Cross Conversion', () => {
 			assert.ok(txt.includes('#!basic-vars:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]'));
 			assert.ok(txt.includes('#!basic-vars:[20,21,22,23,24,25,26,27,28,29]'));
 		});
+
+		it('BASIC prgm, dfile', () => {
+			const conv = new Zx81BasToPfile("1 REM\n2 PRINT") as any;
+			conv.dfileCollapsed = true;
+			conv.dfileOut = [[], [0, 0, 0], [0, 0x1C, 0], [0, 0, 0x1D]];
+			conv.basicVariablesOut = [];
+			const pfile = conv.createPfile();
+			const txt = (Zx81PfileToBas as any).getCommentHeader(pfile);
+			assert.ok(txt.includes('#!dfile:'));
+			// Count occurrences of '#!dfile:'
+			const dfileCount = (txt.match(/#!dfile:/g) || []).length;
+			assert.equal(dfileCount, 4);
+			assert.equal(txt, "#!dfile-collapsed\n#!dfile:\n#!dfile:\n#!dfile: 0\n#!dfile:  1\n\n");
+		});
+
 	});
 });

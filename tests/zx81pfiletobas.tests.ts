@@ -126,6 +126,12 @@ describe('Zx81PfileToBas', () => {
 		});
 	});
 
+	describe('dfile', () => {
+		it('empty', () => {
+			const txt = Zx81PfileToBas.getZx81BasicText(new Uint8Array());
+			assert.equal(txt, '');
+		});
+	});
 
 	describe('errors', () => {
 		it('not end with 0x76', () => {

@@ -128,15 +128,10 @@ export class Zx81PfileToBas {
 		const basic_vars_ptr = this.getWord(data, offsBasicVars);
 		const basic_vars_index = basic_vars_ptr - 0x4009;
 		const dfileSize = basic_vars_index - dfile_index;
-		const offsBasicStart = 0x407D - 0x4009;
-		const offsBasicPrgmEnd = dfile_ptr - 0x4009;
 		const offsBasicEnd = 0x4014 - 0x4009;
 		const basic_end_ptr = this.getWord(data, offsBasicEnd);
 		const basic_end_index = basic_end_ptr - 0x4009;
 		const basicVarsSize = basic_end_index - basic_vars_index;
-		const basicCode = data.slice(offsBasicStart, offsBasicPrgmEnd);
-		// Convert to text
-		let basicTxt = Zx81PfileToBas.getZx81BasicText(basicCode);
 
 		// #!basic-start
 		const offsNXTLIN = 0x4029 - 0x4009;
@@ -150,33 +145,38 @@ export class Zx81PfileToBas {
 
 		// #!dfile
 		if (dfileSize < this.DFILE_MAX_SIZE) {
-			hdr+= '#!dfile-collapsed\n';
+			hdr += '#!dfile-collapsed\n';
 		}
 		// Read dfile (skip first newline)
 		let nextLineStarted = true;
+		let dfileLines = '';
+		let lastCharIndex = 0;
 		for (let i = 1; i < dfileSize; i++) {
-			if (nextLineStarted) {
-				// Print start of line
-				hdr += '#!dfile:';
-			}
 			// Convert dfile byte
 			const code = data[dfile_index + i];
 			if (code === Zx81Tokens.NEWLINE) {
-				hdr += '\n';
+				dfileLines += '\n';
 				nextLineStarted = true;
 				continue;
 			}
 			// Convert to ASCII
 			const charAscii = this.convertToken(code);
-			hdr += charAscii;
+			dfileLines += charAscii;
 			nextLineStarted = false;
+			if(code !== 0)
+				lastCharIndex = dfileLines.length;
 		}
-		if (!hdr.endsWith('\n')) {
-			// Note: if dfile does not end with a newline this is an
-			// error. However, make sure there is an empty line afterwards.
-			hdr += '\n';
+		// Cut off unused lines. (After cutting the last character is not a newline.)
+		dfileLines = dfileLines.slice(0, lastCharIndex);
+		if (dfileLines.length > 0) {
+			// Add #!dfile: to each line
+			dfileLines = dfileLines.replace(/^/mg, '#!dfile:');
+			// Remove trailing spaces from each line
+			dfileLines = dfileLines.replace(/ *$/mg, '');
+			dfileLines += '\n';
 		}
-		hdr += '\n';
+		dfileLines += '\n';
+		hdr += dfileLines;
 
 		// BASIC variables
 		if (basicVarsSize > 1) {
