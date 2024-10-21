@@ -87,8 +87,9 @@ export function activate(context: vscode.ExtensionContext) {
  */
 function configure(context: vscode.ExtensionContext, event?: vscode.ConfigurationChangeEvent) {
     if (event) {
-        if (event.affectsConfiguration('binary-file-viewer.parserFolders')) {
-            // TODO: REMOVE if no config is needed
+        if (event.affectsConfiguration('zx81-bastop.')) {
+            // TODO: REMOVE
+            //const newSetting = config.get('myExtension.newSetting');
         }
     }
 }
