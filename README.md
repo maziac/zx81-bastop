@@ -37,7 +37,7 @@ Right click on a .p file in the explorer area.
 Choose
 - "Convert P-File to ZX81 BASIC": This will open a file selector that ask for a file name for the BASIC file.
 - or "View ZX81 P-File": to open the viewer
-![]() BILDXXX
+![](assets/local/pfileview.jpg)
 In the opened file view you have 2 buttons: one to copy the BASIC into the clipboard and the other to save the BASIC text to a file.
 
 ## BASIC Files
@@ -108,5 +108,5 @@ If you want to turn a p-file to BASIC converted file into lowercase you can use 
 Select all text, choose comand-palette "Transform to lowercase".
 
 # Recommended other extension
-- ZX81 Syntyx Highlighting: XXXXXXXXX
-- DeZog: Z80 (ZX81) Machine Code Debugger to run the P-Files inside vscode.
+- ZX81 BASIC Syntax Highlighting: [ZX81-Basic](https://marketplace.visualstudio.com/items?itemName=WilsonPilon.zx81basic)
+- [DeZog](https://marketplace.visualstudio.com/items?itemName=maziac.dezog): Z80 (ZX81) Machine Code Debugger to run the P-Files inside vscode.
