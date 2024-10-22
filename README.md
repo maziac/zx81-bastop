@@ -89,6 +89,21 @@ The P-File to BASIC conversion always uses uppercase. However, the BASIC to P-Fi
 If you want to turn a P-File to BASIC converted file into lowercase, you can use VSCode's built-in functionality:
 Select all text, then choose the command palette option "Transform to lowercase."
 
+# tasks.json
+Conversion of the *.bas file to a p-file can be put in tasks.json.
+Just like a compiler/build.
+E.g. use:
+~~~json
+    {
+        "label": "Convert ZX81 BASIC",
+        "type": "zx81-bastop.convertbastop",
+        "file": "src/myprgm.bas",
+        "out": "out/myprgm.p"
+    }
+~~~
+
+to convert `myprgm.bas` to `myprgm.p`.
+
 # Recommended Other Extensions
 - [ZX81-Basic](https://marketplace.visualstudio.com/items?itemName=WilsonPilon.zx81basic): ZX81 BASIC Syntax Highlighting
 - [DeZog](https://marketplace.visualstudio.com/items?itemName=maziac.dezog): Z80 (ZX81) Machine Code Debugger to run the P-Files inside VSCode.

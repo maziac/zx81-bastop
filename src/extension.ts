@@ -4,6 +4,7 @@ import {EditorProvider} from './editorprovider';
 import {PackageInfo} from './packageinfo';
 import {Zx81BasToPfile, Zx81ParseError} from './zx81bastopfile';
 import {Diagnostics} from './diagnostics';
+import path = require('path');
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -29,7 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     // Command to convert a ZX81 BASIC text file into a P-file.
-    context.subscriptions.push(vscode.commands.registerCommand('zx81-bastop.convertbastop', async (fileUri: vscode.Uri, outUri: vscode.Uri) => {
+    context.subscriptions.push(vscode.commands.registerCommand('zx81-bastop.convertbastop', async (fileUri: vscode.Uri, outUri: vscode.Uri | undefined) => {
         console.log(`zx81-bastop.convertbastop: file=${fileUri}, out=${outUri}`);
         if (!fileUri)
             return;
@@ -64,18 +65,19 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         // Show save file dialog
-        const pFilePath = (outUri) ? outUri.fsPath : fileUri.fsPath + '.p';
-        const options: vscode.SaveDialogOptions = {
-            saveLabel: 'Save',
-            defaultUri: vscode.Uri.file(pFilePath),
-            filters: {'ZX81 P-Files': ['p']}
-        };
-        const saveUri = await vscode.window.showSaveDialog(options);
-
+        if (!outUri) {
+            const pFilePath = fileUri.fsPath + '.p';
+            const options: vscode.SaveDialogOptions = {
+                saveLabel: 'Save',
+                defaultUri: vscode.Uri.file(pFilePath),
+                filters: {'ZX81 P-Files': ['p']}
+            };
+            outUri = await vscode.window.showSaveDialog(options);
+        }
         // Save the file
-        if (saveUri) {
-            fs.writeFileSync(pFilePath, new Uint8Array(pfile), {encoding: null});
-            vscode.window.showInformationMessage(`ZX81 P-File saved to ${pFilePath}`);
+        if (outUri) {
+            fs.writeFileSync(outUri.fsPath, new Uint8Array(pfile), {encoding: null});
+            vscode.window.showInformationMessage(`ZX81 P-File saved to ${outUri.fsPath}`);
         }
     }));
 
@@ -86,7 +88,7 @@ export function activate(context: vscode.ExtensionContext) {
         },
         resolveTask(task: vscode.Task) {
             //console.log('resolveTask', _task);
-            return getZx81BastopTasks(task);;
+           return getZx81BastopTask(task);
         }
     }));
 
@@ -115,38 +117,51 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
  * Task parameters:
  * file: The *.bas file to convert
  * out: The output file name for the p-file.
- * @returns {vscode.Task[]} An array containing the zx81-bastop conversion task.
+ * @returns vscode.Task An array containing the zx81-bastop conversion task.
  */
-function getZx81BastopTasks(): vscode.Task[] {
-    const tasks: vscode.Task[] = [];
-    const task = new vscode.Task(
-        {
-            type: 'zx81-bastop.convertbastop',
-            file: 'file',
-        },
-        vscode.TaskScope.Workspace,
-        'Convert ZX81 BASIC',
-        'zx81-bastop',
-        new vscode.CustomExecution(async (resolvedDefinition: vscode.TaskDefinition) => {
-            const file = resolvedDefinition.file;
-            const out = resolvedDefinition.out;
+function getZx81BastopTask(task: vscode.Task): vscode.Task {
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0].uri.fsPath || '';
+    let fileUri;
+    let file = task.definition.file;
+    if (file) {
+        if (!path.isAbsolute(file))
+            file = path.join(workspaceFolder, file);
+        fileUri = vscode.Uri.file(file);
+    }
+    let outUri;
+    let out = task.definition.out;
+    if (out) {
+        if (!path.isAbsolute(out))
+            out = path.join(workspaceFolder, out);
+        outUri = vscode.Uri.file(out);
+    }
+    const retTask = new vscode.Task(
+        task.definition,
+        task.scope ?? vscode.TaskScope.Workspace,
+        task.name,
+        task.source,
+        new vscode.CustomExecution(async (): Promise<vscode.Pseudoterminal> => {
             return new Promise<vscode.Pseudoterminal>((resolve) => {
                 const writeEmitter = new vscode.EventEmitter<string>();
                 const closeEmitter = new vscode.EventEmitter<number>();
                 resolve({
                     onDidWrite: writeEmitter.event,
                     onDidClose: closeEmitter.event,
-                    open: () => {
-                        vscode.commands.executeCommand('zx81-bastop.convertbastop', file, out).then(() => {
+                    open: async () => {
+                        try {
+                            await vscode.commands.executeCommand('zx81-bastop.convertbastop', fileUri, outUri);
                             writeEmitter.fire('Conversion complete.\r\n');
                             closeEmitter.fire(0);
-                        });
+                        } catch (error) {
+                            writeEmitter.fire(`Conversion failed: ${error.message}\r\n`);
+                            closeEmitter.fire(1);
+                        }
                     },
                     close: () => {}
                 });
             });
         })
     );
-    tasks.push(task);
-    return tasks;
+
+    return retTask;
 }
