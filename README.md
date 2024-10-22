@@ -1,5 +1,5 @@
 # Support
-If you like the "ZX81 BASIC to P-File Converter," please consider supporting it.
+If you like the "ZX81 BASIC to P-File Converter" please consider supporting it.
 
 <a href="https://github.com/sponsors/maziac" title="Github sponsor">
     <img src="assets/local/button_donate_sp.png" />

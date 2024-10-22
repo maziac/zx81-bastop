@@ -31,7 +31,6 @@
         "Programming Languages"
     ],
     "activationEvents": [
-        "onLanguage:javascript"
     ],
     "capabilities": {
         "untrustedWorkspaces": {
@@ -40,6 +39,17 @@
     },
     "main": "./out/extension",
     "contributes": {
+        "taskDefinitions": [
+            {
+                "type": "zx81-bastop.convertbastop",
+                "properties": {
+                    "file": {
+                        "type": "string",
+                        "description": "The source *.bas file."
+                    }
+                }
+            }
+        ],
         "customEditors": [
             {
                 "viewType": "zx81-bastop.viewer",
