@@ -41,15 +41,22 @@ export function activate(context: vscode.ExtensionContext) {
         // Open document
         const basDoc = await vscode.workspace.openTextDocument(fileUri);
         const basText = basDoc.getText();
+        // Get base folder
+        const baseFolder = path.dirname(fileUri.fsPath);
 
         // BASIC parser
         let pfile;
         try {
             const parser = new Zx81BasToPfile(basText);
+            // Set file reader
+            parser.setReadFileFunction((filename: string) => {
+                const filePath = path.resolve(baseFolder, filename);
+                const fileContent = fs.readFileSync(filePath);
+                const buf = Array.from(fileContent);
+                return buf;
+            });
             // Create pfile
             pfile = parser.createPfile();
-
-         //   pfile = Zx81PfileToBas.createPfile();
         }
         catch (error) {
             // Handle errors

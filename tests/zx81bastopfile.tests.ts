@@ -531,13 +531,27 @@ describe('Zx81BasToPfile', () => {
 		it('!include filename.obj', () => {
 			{
 				const conv = new Zx81BasToPfile('[!include file.obj]') as any;
-				// TODO: real test
-				assert.deepEqual(conv.readSpecialCode(), []);
+				conv.setReadFileFunction((filename: string) => {
+					assert.equal(filename, 'file.obj');
+					return [1, 2, 3];
+				});
+				assert.deepEqual(conv.readSpecialCode(), [1, 2, 3]);
 			}
 			{
-				const conv = new Zx81BasToPfile('[!include ../file.obj]') as any;
-				// TODO: real test
-				assert.deepEqual(conv.readSpecialCode(), []);
+				const conv = new Zx81BasToPfile('[!include   ../file.obj ]') as any;
+				conv.setReadFileFunction((filename: string) => {
+					assert.equal(filename, '../file.obj');
+					return [4, 5];
+				});
+				assert.deepEqual(conv.readSpecialCode(), [4, 5]);
+			}
+			{
+				const conv = new Zx81BasToPfile('[!include   file with space .obj ]') as any;
+				conv.setReadFileFunction((filename: string) => {
+					assert.equal(filename, 'file with space .obj');
+					return [6, 7];
+				});
+				assert.deepEqual(conv.readSpecialCode(), [6, 7]);
 			}
 		});
 		it('# comment', () => {

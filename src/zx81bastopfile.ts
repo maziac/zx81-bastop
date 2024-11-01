@@ -41,7 +41,7 @@ export class Zx81BasToPfile {
 	protected regexInt = /\d+/y
 
 	// Regex for special codes e.g. [#size=100], [#include folder/file.obj] or a simple number [123].
-	protected specialCodeRegex = /\[(#.*?|\d+|!block\s*=\s*(\d+)\s*|!include\s+([\w.\/]+)\s*)\]/iy;
+	protected specialCodeRegex = /\[(#.*?|\d+|!block\s*=\s*(\d+)\s*|!include\s+([\w.\/ ]+)\s*)\]/iy;
 
 	// Regex for the comment header #! (for BASIC start line)
 	protected commentHdrRegex = /#![ \t]*(basic-start[ \t]*(=)?[ \t]*|dfile-collapsed\b|dfile:|basic-vars:[ \t]*|.*)?/iy;
@@ -69,6 +69,9 @@ export class Zx81BasToPfile {
 	// Is read from the comment header. Whether the dfile is collapsed or not.
 	public dfileCollapsed = false;
 
+	// A function pointer that is set and will read the contents of a file.
+	protected readFile: (filename: string) => number[] = filename => this.throwError("'readFile' not implemented.");
+
 
 	// Constructor.
 	constructor(str: string) {
@@ -91,6 +94,15 @@ export class Zx81BasToPfile {
 		}
 		this.normalRegex = this.createRegex(Array.from(this.normalMap.keys()));
 		this.remQuotedRegex = this.createRegex(Array.from(this.remQuotedMap.keys()));
+	}
+
+
+	/** Set the function to read a file.
+	 * Is used by the special code !include.
+	 * @param readFile The function to read a file.
+	 */
+	public setReadFileFunction(readFile: (filename: string) => number[]): void {
+		this.readFile = readFile;
 	}
 
 
@@ -393,9 +405,13 @@ export class Zx81BasToPfile {
 			buf = new Array<number>(size).fill(0);
 		}
 		else if (code.startsWith('!include')) {
-			const filename = result[2];
-			// TODO: Read "File" and return the content
-			buf = [];
+			let filename;
+			try {
+				filename = result[3].trim();
+				buf = this.readFile(filename);
+			} catch (err) {
+				this.throwError(`Failed to read file '${filename}': ${err.message}`);
+			}
 		}
 		else {
 			// Number
