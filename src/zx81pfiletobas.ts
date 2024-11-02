@@ -148,7 +148,6 @@ export class Zx81PfileToBas {
 			hdr += '#!dfile-collapsed\n';
 		}
 		// Read dfile (skip first newline)
-		let nextLineStarted = true;
 		let dfileLines = '';
 		let lastCharIndex = 0;
 		for (let i = 1; i < dfileSize; i++) {
@@ -156,13 +155,11 @@ export class Zx81PfileToBas {
 			const code = data[dfile_index + i];
 			if (code === Zx81Tokens.NEWLINE) {
 				dfileLines += '\n';
-				nextLineStarted = true;
 				continue;
 			}
 			// Convert to ASCII
 			const charAscii = Zx81Tokens.convertToken(code);
 			dfileLines += charAscii;
-			nextLineStarted = false;
 			if(code !== 0)
 				lastCharIndex = dfileLines.length;
 		}

@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 */
 export class Diagnostics {
 	// The diagnostics collection.
-	private static diagnosticCollection = vscode.languages.createDiagnosticCollection('ZX81 BASIC Converter');
+	private static readonly diagnosticCollection = vscode.languages.createDiagnosticCollection('ZX81 BASIC Converter');
 
 
 	/** Set an error.

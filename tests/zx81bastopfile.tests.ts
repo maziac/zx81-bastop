@@ -17,7 +17,7 @@ describe('Zx81BasToPfile', () => {
 			assert.equal(conv.remQuotedMap.get("[RND]"), 0x40);
 			assert.equal(conv.remQuotedMap.get("[INKEY$]"), 0x41);
 			assert.equal(conv.remQuotedMap.get("[PI]"), 0x42);
-			assert.equal(conv.remQuotedMap.get("\@@"), 0x88);
+			assert.equal(conv.remQuotedMap.get("@@"), 0x88);
 			assert.equal(conv.remQuotedMap.get("A"), 0x26);
 			assert.equal(conv.remQuotedMap.get("%A"), 0xA6);
 			assert.equal(conv.remQuotedMap.get("\\\""), 0xC0);
@@ -147,7 +147,7 @@ describe('Zx81BasToPfile', () => {
 			{
 				const conv = new Zx81BasToPfile("00.04E+2") as any;
 				assert.deepEqual(conv.readNumber(), [
-					28, 28,	27, 28, 32, 42, 21, 30,
+					28, 28, 27, 28, 32, 42, 21, 30,
 					126,	// Number
 					131, 0, 0, 0, 0
 				]);
@@ -236,7 +236,7 @@ describe('Zx81BasToPfile', () => {
 		});
 
 		it('graphics (inverted)', () => {
-			const conv = new Zx81BasToPfile("\"\\\::\\.:\\:.\\..\\':\\ :\\'.\\ .\@@\\;;\\!!\"") as any;
+			const conv = new Zx81BasToPfile("\"\\::\\.:\\:.\\..\\':\\ :\\'.\\ .@@\\;;\\!!\"") as any;
 			assert.deepEqual(conv.readQuotedString(), [0x0B,
 				128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138,
 				0x0B]);
@@ -305,12 +305,10 @@ describe('Zx81BasToPfile', () => {
 
 	describe('readRem', () => {
 		it('empty', () => {
-			{
-				const conv = new Zx81BasToPfile('\n') as any;
-				assert.deepEqual(conv.readRem(), []);
-				assert.equal(conv.position, 1);
-				assert.equal(conv.colNr, 0);
-			}
+			const conv = new Zx81BasToPfile('\n') as any;
+			assert.deepEqual(conv.readRem(), []);
+			assert.equal(conv.position, 1);
+			assert.equal(conv.colNr, 0);
 		});
 
 		it('col, line', () => {
@@ -329,25 +327,21 @@ describe('Zx81BasToPfile', () => {
 		});
 
 		it('normal', () => {
-			{
-				const conv = new Zx81BasToPfile('01234\n') as any;
-				assert.deepEqual(conv.readRem(), [
-					0x1c, 0x1d, 0x1e, 0x1f, 0x20
-				]);
-				assert.equal(conv.position, 6);
-				assert.equal(conv.colNr, 0);
-			}
+			const conv = new Zx81BasToPfile('01234\n') as any;
+			assert.deepEqual(conv.readRem(), [
+				0x1c, 0x1d, 0x1e, 0x1f, 0x20
+			]);
+			assert.equal(conv.position, 6);
+			assert.equal(conv.colNr, 0);
 		});
 
 		it('cont', () => {
-			{
-				const conv = new Zx81BasToPfile('012\\ \n34\n') as any;
-				assert.deepEqual(conv.readRem(), [
-					0x1c, 0x1d, 0x1e, 0x1f, 0x20
-				]);
-				assert.equal(conv.position, 9);
-				assert.equal(conv.colNr, 0);
-			}
+			const conv = new Zx81BasToPfile('012\\ \n34\n') as any;
+			assert.deepEqual(conv.readRem(), [
+				0x1c, 0x1d, 0x1e, 0x1f, 0x20
+			]);
+			assert.equal(conv.position, 9);
+			assert.equal(conv.colNr, 0);
 		});
 
 		it('graphics', () => {
@@ -361,7 +355,7 @@ describe('Zx81BasToPfile', () => {
 			const conv = new Zx81BasToPfile('#AB %CD EZ') as any;
 			assert.deepEqual(conv.readRem(), [
 				0x0C, 0x26, 0x27, 0, 0xA8, 0x29, 0, 0x2A, 0x3F
-				]);
+			]);
 		});
 
 		// Note: The rest of the implementation is similar to the readQuotedString. Therefore further tests are skipped.
@@ -403,12 +397,10 @@ describe('Zx81BasToPfile', () => {
 
 
 		it('regex tab', () => {
-			{
-				const conv = new Zx81BasToPfile(" MYTOKEN\t") as any;
-				assert.equal(conv.readToken(/^(T1|\sMYTOKEN\s)/), " MYTOKEN ");
-				assert.equal(conv.position, 9);
-				assert.equal(conv.colNr, 9);
-			}
+			const conv = new Zx81BasToPfile(" MYTOKEN\t") as any;
+			assert.equal(conv.readToken(/^(T1|\sMYTOKEN\s)/), " MYTOKEN ");
+			assert.equal(conv.position, 9);
+			assert.equal(conv.colNr, 9);
 		});
 
 		it('remQuotedMap', () => {
@@ -497,12 +489,10 @@ describe('Zx81BasToPfile', () => {
 			}
 		});
 		it('out of range', () => {
-			{
-				const conv = new Zx81BasToPfile('[256]') as any;
-				assert.throws(() => {
-					conv.readSpecialCode();
-				});
-			}
+			const conv = new Zx81BasToPfile('[256]') as any;
+			assert.throws(() => {
+				conv.readSpecialCode();
+			});
 		});
 		it('no match', () => {
 			{
@@ -555,10 +545,9 @@ describe('Zx81BasToPfile', () => {
 			}
 		});
 		it('# comment', () => {
-			{
-				const conv = new Zx81BasToPfile('[#some comment]') as any;
-				assert.deepEqual(conv.readSpecialCode(), []);
-			}
+			const conv = new Zx81BasToPfile('[#some comment]') as any;
+			assert.deepEqual(conv.readSpecialCode(), []);
+
 		});
 
 		describe('ungreedy', () => {
@@ -633,18 +622,14 @@ describe('Zx81BasToPfile', () => {
 				assert.deepEqual(conv.basicVariablesOut, [123]);
 			});
 			it('multiple values', () => {
-				{
-					const conv = new Zx81BasToPfile("[123,214]") as any;
-					conv.handleBasicVars();
-					assert.deepEqual(conv.basicVariablesOut, [123, 214]);
-				}
+				const conv = new Zx81BasToPfile("[123,214]") as any;
+				conv.handleBasicVars();
+				assert.deepEqual(conv.basicVariablesOut, [123, 214]);
 			});
 			it('with spaces', () => {
-				{
-					const conv = new Zx81BasToPfile("[ 123 , 214 ]") as any;
-					conv.handleBasicVars();
-					assert.deepEqual(conv.basicVariablesOut, [123, 214]);
-				}
+				const conv = new Zx81BasToPfile("[ 123 , 214 ]") as any;
+				conv.handleBasicVars();
+				assert.deepEqual(conv.basicVariablesOut, [123, 214]);
 			});
 			it('exceptions', () => {
 				{
@@ -738,19 +723,19 @@ describe('Zx81BasToPfile', () => {
 		});
 
 		it('basic-vars:[]', () => {
-				const conv = new Zx81BasToPfile("#!basic-vars:[]") as any;
-				assert.equal(conv.parseCommentHeader(), true);
-				assert.deepEqual(conv.basicVariablesOut, []);
+			const conv = new Zx81BasToPfile("#!basic-vars:[]") as any;
+			assert.equal(conv.parseCommentHeader(), true);
+			assert.deepEqual(conv.basicVariablesOut, []);
 		});
 		it('basic-vars: [ ] ', () => {
-				const conv = new Zx81BasToPfile("#!basic-vars: [ ] ") as any;
-				assert.equal(conv.parseCommentHeader(), true);
-				assert.deepEqual(conv.basicVariablesOut, []);
+			const conv = new Zx81BasToPfile("#!basic-vars: [ ] ") as any;
+			assert.equal(conv.parseCommentHeader(), true);
+			assert.deepEqual(conv.basicVariablesOut, []);
 		});
 		it('basic-vars:[231]', () => {
-				const conv = new Zx81BasToPfile("#!basic-vars:[231]") as any;
-				assert.equal(conv.parseCommentHeader(), true);
-				assert.deepEqual(conv.basicVariablesOut, [231]);
+			const conv = new Zx81BasToPfile("#!basic-vars:[231]") as any;
+			assert.equal(conv.parseCommentHeader(), true);
+			assert.deepEqual(conv.basicVariablesOut, [231]);
 		});
 		it('basic-vars:[ 231 ]', () => {
 			const conv = new Zx81BasToPfile("#!basic-vars:[ 231 ]") as any;
@@ -977,9 +962,9 @@ describe('Zx81BasToPfile', () => {
 				]);
 			});
 
-			it('\"', () => {
+			it('"', () => {
 				const conv = new Zx81BasToPfile(
-					'10 PLOT %\"') as any;
+					'10 PLOT %"') as any;
 				conv.encodeBasic();
 				const buf = conv.basicCodeOut;
 				assert.deepEqual(buf, [
@@ -1240,7 +1225,7 @@ describe('Zx81BasToPfile', () => {
 				const conv = new Zx81BasToPfile('120 [IF][INKEY$]=""[THEN][GOTO]120') as any;
 				conv.encodeBasic();
 				const buf = conv.basicCodeOut;
-				assert.deepEqual(buf.slice(0,4+17-7), [
+				assert.deepEqual(buf.slice(0, 4 + 17 - 7), [
 					0, 120,	// Line number
 					17, 0,	// Size
 					0xFA,	// [IF]
@@ -1516,7 +1501,7 @@ describe('Zx81BasToPfile', () => {
 				assert.equal(conv.eos(), false);
 			}
 		});
-		it('continuation \ ', () => {
+		it('continuation \\', () => {
 			const conv = new Zx81BasToPfile("  \\ \n 100") as any;
 			conv.skipSpacesEtc();
 			assert.equal(conv.position, 6);
@@ -1524,7 +1509,7 @@ describe('Zx81BasToPfile', () => {
 			assert.equal(conv.lineNr, 1);
 			assert.equal(conv.eos(), false);
 		});
-		it('no continuation \ ', () => {
+		it('no continuation \\', () => {
 			const conv = new Zx81BasToPfile("  \\ a \n 100") as any;
 			conv.skipSpacesEtc();
 			assert.equal(conv.position, 2);

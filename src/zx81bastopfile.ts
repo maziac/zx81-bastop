@@ -43,7 +43,7 @@ export class Zx81BasToPfile extends EventEmitter {
 	protected regexInt = /\d+/y
 
 	// Regex for special codes e.g. [#size=100], [#include folder/file.obj] or a simple number [123].
-	protected specialCodeRegex = /\[(#.*?|\d+|!block\s*=\s*(\d+)\s*|!include\s+([\w.\/ ]+)\s*)\]/iy;
+	protected specialCodeRegex = /\[(#.*?|\d+|!block\s*=\s*(\d+)\s*|!include\s+([\w./ ]+)\s*)\]/iy;
 
 	// Regex for the comment header #! (for BASIC start line)
 	protected commentHdrRegex = /#![ \t]*(basic-start[ \t]*(=)?[ \t]*|dfile-collapsed\b|dfile:|basic-vars:[ \t]*|.*)?/iy;
@@ -169,7 +169,7 @@ export class Zx81BasToPfile extends EventEmitter {
 		const buffer: number[] = [];
 		for (let char of numberStr) {
 			// Each character one by one
-			const zx81Char = this.normalMapGet(char)!;
+			const zx81Char = this.normalMapGet(char);
 			buffer.push(zx81Char);
 		}
 
@@ -289,7 +289,7 @@ export class Zx81BasToPfile extends EventEmitter {
 			// Else
 			this.throwError('Token unknown.');
 		}
-		const tokenNumber = this.remQuotedMapGet(token)!;
+		const tokenNumber = this.remQuotedMapGet(token);
 		return [tokenNumber];
 	}
 
@@ -330,7 +330,7 @@ export class Zx81BasToPfile extends EventEmitter {
 			if (!token)
 				this.throwError('Parse error.');
 			// Add to buffer
-			const tokenNumber = this.normalMapGet(token)!;
+			const tokenNumber = this.normalMapGet(token);
 			buffer.push(tokenNumber);
 		}
 
@@ -373,7 +373,7 @@ export class Zx81BasToPfile extends EventEmitter {
 			this.colNr--;
 		}
 		// Fix to white spaces
-		const fixedToken = foundToken!.replace(/^\s|\s$/g, ' ');
+		const fixedToken = foundToken.replace(/^\s|\s$/g, ' ');
 		return fixedToken;
 	}
 
@@ -691,7 +691,7 @@ export class Zx81BasToPfile extends EventEmitter {
 			const token = this.readToken(this.normalRegex);
 			if (!token)
 				this.throwError("Unknown command");
-			const tokenNumber = this.normalMapGet(token)!;
+			const tokenNumber = this.normalMapGet(token);
 			this.basicCodeOut.push(tokenNumber);
 			// Check for BASIC commands
 			if (!Zx81Tokens.isCommand(tokenNumber)) {

@@ -131,7 +131,7 @@ function configure(context: vscode.ExtensionContext, event?: vscode.Configuratio
  * @returns vscode.Task An array containing the zx81-bastop conversion task.
  */
 function getZx81BastopTask(task: vscode.Task): vscode.Task {
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0].uri.fsPath || '';
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0].uri.fsPath ?? '';
     let fileUri;
     let file = task.definition.file;
     if (file) {
