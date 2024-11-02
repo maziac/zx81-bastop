@@ -687,6 +687,7 @@ export class Zx81BasToPfile extends EventEmitter {
 			this.skipSpacesAndCont();
 
 			// Check for first command
+			const lastColumn = this.colNr;
 			const token = this.readToken(this.normalRegex);
 			if (!token)
 				this.throwError("Unknown command");
@@ -695,7 +696,7 @@ export class Zx81BasToPfile extends EventEmitter {
 			// Check for BASIC commands
 			if (!Zx81Tokens.isCommand(tokenNumber)) {
 				// Spit out a warning
-				this.showWarning("Command expected but got: '" + token + "'");
+				this.showWarning("Command expected but got: '" + token + "'", this.lineNr, lastColumn);
 			}
 			// Check for REM
 			if (tokenNumber === Zx81Tokens.REM) {
@@ -861,8 +862,8 @@ export class Zx81BasToPfile extends EventEmitter {
 	}
 
 	/// Emits a warning.
-	protected showWarning(message: string): void {
-		this.emit('warning', message, this.lineNr, this.colNr);
+	protected showWarning(message: string, lineNr = this.lineNr, colNr = this.colNr): void {
+		this.emit('warning', message, lineNr, colNr);
 	}
 }
 

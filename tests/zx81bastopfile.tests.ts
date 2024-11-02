@@ -1170,6 +1170,21 @@ describe('Zx81BasToPfile', () => {
 			});
 		});
 
+		describe('warnings', () => {
+			it('Command expected', () => {
+				const conv = new Zx81BasToPfile("10 PL OT") as any;
+				let warningOccurred = false;
+				conv.on('warning', (msg: string, line: number, col: number) => {
+					warningOccurred = true;
+					assert.ok(msg.startsWith('Command expected'));
+					assert.equal(line, 0);
+					assert.equal(col, 3);
+				});
+				conv.encodeBasic();
+				assert.ok(warningOccurred);
+			});
+		});
+
 		describe('nextLineOffset', () => {
 			it('empty comment header', () => {
 				const conv = new Zx81BasToPfile("#! \n10 PRINT") as any;
