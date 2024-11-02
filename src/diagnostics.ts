@@ -19,6 +19,19 @@ export class Diagnostics {
 		this.diagnosticCollection.set(uri, [diagnostic]);
 	}
 
+	/** Set a warning.
+	 * @param message The warning message.
+	 * @param uri The uri of the file.
+	 * @param line The line number.
+	 * @param col The column number.
+	 */
+	public static setWarning(message: string, uri: vscode.Uri, line: number, col: number) {
+		const range = new vscode.Range(line, col, line, col);
+		const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
+		this.diagnosticCollection.set(uri, [diagnostic]);
+	}
+
+
 	/** Clear all diagnostics. */
 	public static clearDiagnostics() {
 		this.diagnosticCollection.clear();

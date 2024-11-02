@@ -55,6 +55,10 @@ export function activate(context: vscode.ExtensionContext) {
                 const buf = Array.from(fileContent);
                 return buf;
             });
+            // Listen for warnings
+            parser.on('warning', (message: string, line: number, column: number) => {
+                Diagnostics.setWarning(message, fileUri, line, column);
+            });
             // Create pfile
             pfile = parser.createPfile();
         }

@@ -1,11 +1,13 @@
+import {EventEmitter} from "stream";
 import {Zx81Tokens} from "./zx81tokens";
+
 
 /** Converts the ZX81 BASIC file to code.
  * See ptobasconversion.md for the details.
  */
-export class Zx81BasToPfile {
-	// The omplete BASIC text to convert.
-	private str: string;
+export class Zx81BasToPfile extends EventEmitter {
+	// The complete BASIC text to convert.
+	private readonly str: string;
 	// The position (index) in the string.
 	private position = 0;
 	// The current line nr.
@@ -75,6 +77,7 @@ export class Zx81BasToPfile {
 
 	// Constructor.
 	constructor(str: string) {
+		super();
 		// Remove windows line endings
 		this.str = str.replace(/\r/g, '');
 		// Make sure str ends with a newline
@@ -689,6 +692,12 @@ export class Zx81BasToPfile {
 				this.throwError("Unknown command");
 			const tokenNumber = this.normalMapGet(token)!;
 			this.basicCodeOut.push(tokenNumber);
+			// Check for BASIC commands
+			if (!Zx81Tokens.isCommand(tokenNumber)) {
+				// Spit out a warning
+				this.showWarning("Command expected but got: '" + token + "'");
+			}
+			// Check for REM
 			if (tokenNumber === Zx81Tokens.REM) {
 				// REM
 				const buf = this.readRem();
@@ -849,6 +858,11 @@ export class Zx81BasToPfile {
 		if (k > 0)
 			msg += ": '" + curText + "'";
 		throw new Zx81ParseError(msg, this.lineNr, this.colNr);
+	}
+
+	/// Emits a warning.
+	protected showWarning(message: string): void {
+		this.emit('warning', message, this.lineNr, this.colNr);
 	}
 }
 
