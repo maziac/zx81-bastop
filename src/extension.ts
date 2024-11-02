@@ -24,7 +24,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.executeCommand('vscode.openWith', uri, 'zx81-bastop.viewer');
     }));
 
-    // Command to convert a ZX81 BASIC text file into a P-file.
+    // Command to convert a p-file into a ZX81 BASIC text file.
     context.subscriptions.push(vscode.commands.registerCommand('zx81-bastop.convertptobas', async uri => {
         // TODO
     }));
