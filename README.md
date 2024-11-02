@@ -25,24 +25,24 @@ There is also a viewer for P-Files included that shows the system variables, the
 
 # Installation
 
-Install through the Visual Studio Code Marketplace. The extension is called "ZX81 BASIC to P-File Converter (zx81-bastop)."
+Install through the Visual Studio Code Marketplace. The extension is called "ZX81 BASIC to P-File Converter" (zx81-bastop).
 
 # Usage
 ## P-Files
 Right-click on a .p file in the explorer area. Choose:
-- "Convert P-File to ZX81 BASIC": This will open a file selector that asks for a file name for the BASIC file.
 - "View ZX81 P-File": to open the viewer.
 
-![](assets/local/pfileview.jpg)
+    ![](assets/local/pfileview.jpg)
 
-In the opened file view, you have two buttons: one to copy the BASIC code to the clipboard and another to save the BASIC text to a file.
+    In the opened file view, you have two buttons: one to copy the BASIC code to the clipboard and another to save the BASIC text to a file.
+- "Convert P-File to ZX81 BASIC": Alternatively you can directly convert a P-File to BASIC code without opening the viewer. You will be prompted with a file selector that asks for a file name for the BASIC file.
 
 ## BASIC Files
 Right-click on a .bas file in the explorer area or in an opened editor. Choose "Convert ZX81 BASIC to P-File." This will open a file selector that asks for a file name for the P-File.
 
 # More Info
 - In most cases, the extension should be capable of displaying P-Files correctly. If you encounter problems, please let me know.
-- Especially for 1k programs often use the DFILE area as BASIC program space to start machine code. This extension will is able to handle it and display even the BASIC code inside the DFILE area.
+- Especially 1k programs often use the DFILE area as BASIC program space to start machine code. This extension is able to handle it and display even the BASIC code inside the DFILE area.
 - The BASIC to P-File converter can handle both lower and upper case. Both are treated the same. Of course, in the ZX81 world all is uppercase.
 - This extension is not a full BASIC parser. It just looks for tokens and converts them. This may result in some ambiguities in BASIC variable names. For example, if you use "PRINT" as a variable name, it is difficult to distinguish it from the BASIC command "PRINT." To overcome this problem:
   - For your own code: avoid using ambiguous variable names.
@@ -90,7 +90,7 @@ If you want to turn a P-File to BASIC converted file into lowercase, you can use
 Select all text, then choose the command palette option "Transform to lowercase."
 
 # tasks.json
-Conversion of the *.bas file to a p-file can be put in tasks.json.
+Conversion of the *.bas file to a P-File can be put in tasks.json for automation.
 Just like a compiler/build.
 E.g. use:
 ~~~json
