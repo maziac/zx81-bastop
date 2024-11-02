@@ -585,6 +585,7 @@ describe('Zx81BasToPfile', () => {
 			});
 			it('[!include ../file.obj][3]', () => {
 				const conv = new Zx81BasToPfile('[!include ../file.obj][3]') as any;
+				conv.setReadFileFunction(_filename => []);
 				conv.readSpecialCode();
 				assert.equal(conv.position, 22);
 			});
