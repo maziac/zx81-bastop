@@ -104,24 +104,23 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
 
-    // Check for every change.
-    context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
-        configure(context, event);
-    }));
+    // // Check for every change.
+    // context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
+    //     configure(context, event);
+    // }));
 }
 
 
-/**
- * Reads the configuration.
- */
-function configure(context: vscode.ExtensionContext, event?: vscode.ConfigurationChangeEvent) {
-    if (event) {
-        if (event.affectsConfiguration('zx81-bastop.')) {
-            // TODO: REMOVE
-            //const newSetting = config.get('myExtension.newSetting');
-        }
-    }
-}
+// /**
+//  * Reads the configuration.
+//  */
+// function configure(context: vscode.ExtensionContext, event?: vscode.ConfigurationChangeEvent) {
+//     if (event) {
+//         if (event.affectsConfiguration('zx81-bastop.')) {
+//             //const newSetting = config.get('myExtension.newSetting');
+//         }
+//     }
+// }
 
 
 /** Creates a task to convert a BASSIC file to a p-file.
