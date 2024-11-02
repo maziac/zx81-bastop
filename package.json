@@ -30,8 +30,7 @@
         "Visualization",
         "Programming Languages"
     ],
-    "activationEvents": [
-    ],
+    "activationEvents": [],
     "capabilities": {
         "untrustedWorkspaces": {
             "supported": true
@@ -72,8 +71,7 @@
         "configuration": {
             "type": "object",
             "title": "zx81-bastop configuration",
-            "properties": {
-            }
+            "properties": {}
         },
         "commands": [
             {
@@ -147,12 +145,12 @@
         "path": "^0.12.7"
     },
     "devDependencies": {
+        "@types/mocha": "10.0.6",
         "@types/node": "^20.11.30",
         "@types/vscode": "^1.75.0",
         "@types/vscode-webview": "^1.57.5",
         "esbuild": "^0.20.2",
-        "@types/mocha": "10.0.6",
-        "mocha": "^10.4.0",
+        "mocha": "^10.8.2",
         "source-map-support": "^0.5.21",
         "typescript": "^5.4.3"
     }
