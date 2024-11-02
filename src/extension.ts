@@ -5,6 +5,7 @@ import {PackageInfo} from './packageinfo';
 import {Zx81BasToPfile, Zx81ParseError} from './zx81bastopfile';
 import {Diagnostics} from './diagnostics';
 import path = require('path');
+import {EditorDocument} from './editordocument';
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -26,7 +27,18 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Command to convert a p-file into a ZX81 BASIC text file.
     context.subscriptions.push(vscode.commands.registerCommand('zx81-bastop.convertptobas', async uri => {
-        // TODO
+        try {
+            const filePath = uri.fsPath;
+            // Read file
+            const [data, offset] = EditorDocument.getPfileData(filePath);
+            // Get BASIC text
+            const basicText = EditorDocument.getCommentHeaderAndBasicText(data.slice(offset), false);
+            // Save as
+            await EditorDocument.saveBasicAs(basicText, filePath);
+        }
+        catch (error) {
+            vscode.window.showErrorMessage('Error: ' + error);
+        }
     }));
 
     // Command to convert a ZX81 BASIC text file into a P-file.
