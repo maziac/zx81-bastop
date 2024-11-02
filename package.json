@@ -97,6 +97,14 @@
                 {
                     "command": "zx81-bastop.open",
                     "when": "false"
+                },
+                {
+                    "command": "zx81-bastop.convertptobas",
+                    "when": "false"
+                },
+                {
+                    "command": "zx81-bastop.convertbastop",
+                    "when": "false"
                 }
             ],
             "explorer/context": [
