@@ -1156,18 +1156,19 @@ describe('Zx81BasToPfile', () => {
 			});
 		});
 
-		describe('warnings', () => {
+		describe('errors', () => {
 			it('Command expected', () => {
 				const conv = new Zx81BasToPfile("10 PL OT") as any;
-				let warningOccurred = false;
-				conv.on('warning', (msg: string, line: number, col: number) => {
-					warningOccurred = true;
-					assert.ok(msg.startsWith('Command expected'));
-					assert.equal(line, 0);
-					assert.equal(col, 3);
-				});
-				conv.encodeBasic();
-				assert.ok(warningOccurred);
+				try {
+					conv.encodeBasic();
+					// Should not reach here
+					assert.fail();
+				}
+				catch (e) {
+					assert.ok(e.message.startsWith('Command expected'));
+					assert.equal(e.line, 0);
+					assert.equal(e.column, 3);
+				}
 			});
 		});
 
