@@ -847,7 +847,7 @@ export class Zx81BasToPfile extends EventEmitter {
 
 
 	/// Throws an exception and adds the line and column number.
-	protected throwError(message: string): never {
+	protected throwError(message: string, lineNr = this.lineNr, colNr = this.colNr): never {
 		const len = 20
 		let curText = this.str.substring(this.position, this.position + len);
 		const k = curText.indexOf('\n');
@@ -858,7 +858,7 @@ export class Zx81BasToPfile extends EventEmitter {
 		let msg = message;
 		if (k > 0)
 			msg += ": '" + curText + "'";
-		throw new Zx81ParseError(msg, this.lineNr, this.colNr);
+		throw new Zx81ParseError(msg, lineNr, colNr);
 	}
 
 	/// Emits a warning.
