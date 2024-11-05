@@ -40,6 +40,15 @@ Right-click on a .p file in the explorer area. Choose:
 ## BASIC Files
 Right-click on a .bas file in the explorer area or in an opened editor. Choose "Convert ZX81 BASIC to P-File." This will open a file selector that asks for a file name for the P-File.
 
+If you have [DeZog](xxx) installed you can also directly run the BASIC program on a ZX81 emulator inside vscode.
+In the upper right you find a "run" icon (the triangle).
+Click to run:
+![](assets/local/run-demo.gif)
+
+You can also select the memory configuration:
+![](assets/local/run-select.jpg)
+
+
 # More Info
 - In most cases, the extension should be capable of displaying P-Files correctly. If you encounter problems, please let me know.
 - Especially 1k programs often use the DFILE area as BASIC program space to start machine code. This extension is able to handle it and display even the BASIC code inside the DFILE area.
