@@ -696,7 +696,7 @@ export class Zx81BasToPfile extends EventEmitter {
 			// Check for BASIC commands
 			if (!Zx81Tokens.isCommand(tokenNumber)) {
 				// Spit out a warning
-				this.showWarning("Command expected but got: '" + token + "'", this.lineNr, lastColumn);
+				this.throwError("Command expected but got: '" + token + "'", this.lineNr, lastColumn);
 			}
 			// Check for REM
 			if (tokenNumber === Zx81Tokens.REM) {
