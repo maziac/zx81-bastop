@@ -2,7 +2,7 @@
     "name": "zx81-bastop",
     "displayName": "A ZX81 BASIC to P-File Converter and a Viewer for P-Files",
     "description": "The extension does 2 things: A) It can convert ZX81 .bas files containing ZX81 BASIC into .p files and B) it is a viewer for ZX81 p-file contents. Showing the BASIC program and the screen (dfile) contents. It can view .P, .O and .P81 files. It can also extract the BASIC program from the file as text.",
-    "version": "1.0.0",
+    "version": "1.1.0-rc1",
     "publisher": "maziac",
     "author": {
         "name": "Thomas Busse"
@@ -88,6 +88,36 @@
                 "command": "zx81-bastop.convertbastop",
                 "title": "Convert ZX81 BASIC to P-File",
                 "category": "zx81-bastop.convert"
+            },
+            {
+                "command": "zx81-bastop.basrunwith1k",
+                "title": "Run ZX81 BASIC with 1K RAM",
+                "shortTitle": "1k",
+                "category": "zx81-bastop.run",
+                "icon": {
+                    "dark": "assets/local/run-1k-dark.svg",
+                    "light": "assets/local/run-1k-light.svg"
+                }
+            },
+            {
+                "command": "zx81-bastop.basrunwith16k",
+                "title": "Run ZX81 BASIC with 16K RAM",
+                "shortTitle": "16k",
+                "category": "zx81-bastop.run",
+                "icon": {
+                    "dark": "assets/local/run-16k-dark.svg",
+                    "light": "assets/local/run-16k-light.svg"
+                }
+            },
+            {
+                "command": "zx81-bastop.basrunwith56k",
+                "title": "Run ZX81 BASIC with 56K RAM",
+                "shortTitle": "56k",
+                "category": "zx81-bastop.run",
+                "icon": {
+                    "dark": "assets/local/run-56k-dark.svg",
+                    "light": "assets/local/run-56k-light.svg"
+                }
             }
         ],
         "menus": {
@@ -120,6 +150,23 @@
                     "group": "navigation",
                     "command": "zx81-bastop.convertbastop",
                     "when": "resourceExtname == .bas || resourceExtname == .BAS"
+                }
+            ],
+            "editor/title/run": [
+                {
+                    "command": "zx81-bastop.basrunwith1k",
+                    "when": "resourceExtname == .bas || resourceExtname == .BAS",
+                    "group": "run@3"
+                },
+                {
+                    "command": "zx81-bastop.basrunwith16k",
+                    "when": "resourceExtname == .bas || resourceExtname == .BAS",
+                    "group": "run@2"
+                },
+                {
+                    "command": "zx81-bastop.basrunwith56k",
+                    "when": "resourceExtname == .bas || resourceExtname == .BAS",
+                    "group": "run@1"
                 }
             ],
             "editor/context": [
