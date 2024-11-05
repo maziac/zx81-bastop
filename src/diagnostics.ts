@@ -17,6 +17,8 @@ export class Diagnostics {
 		const range = new vscode.Range(line, col, line, col);
 		const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Error);
 		this.diagnosticCollection.set(uri, [diagnostic]);
+		// Bring the PROBLEMS pane to the front
+		vscode.commands.executeCommand('workbench.actions.view.problems');
 	}
 
 	/** Set a warning.
@@ -28,7 +30,8 @@ export class Diagnostics {
 	public static setWarning(message: string, uri: vscode.Uri, line: number, col: number) {
 		const range = new vscode.Range(line, col, line, col);
 		const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
-		this.diagnosticCollection.set(uri, [diagnostic]);
+		this.diagnosticCollection.set(uri, [diagnostic]);   // Bring the PROBLEMS pane to the front
+		vscode.commands.executeCommand('workbench.actions.view.problems');
 	}
 
 
