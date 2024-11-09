@@ -343,6 +343,26 @@ export class Zx81BasToPfile extends EventEmitter {
 	}
 
 
+	/** Checks the variable name after LET.
+	 * If it is a problematic name, a warning is shown.
+	 * Problematic names are names that are same as a BASIC command.
+	 */
+	protected regexVariableName = /[\t ]*([A-Z][A-Z0-9]*)/iy;
+	protected checkVariableName() {
+		this.regexVariableName.lastIndex = this.position;
+		const result = this.regexVariableName.exec(this.str);
+		if (!result)
+			this.throwError('Variable name expected');
+		// Compare variable name with BASIC commands
+		const varName = result[1];
+		const tokenNumber = this.normalMapGet('[' + varName + ']');
+		if (tokenNumber !== undefined) {
+			this.showWarning("Variable name '" + varName + "' is same as a BASIC command. This may or may not be a problem. To be on the safe side better rename it.");
+		}
+		return;
+	}
+
+
 	// Check for end of string.
 	// @param length The length of available bytes to check.
 	public eos(length = 1): boolean {
@@ -697,6 +717,12 @@ export class Zx81BasToPfile extends EventEmitter {
 			if (!Zx81Tokens.isCommand(tokenNumber)) {
 				// Spit out a warning
 				this.throwError("Command expected but got: '" + token + "'", this.lineNr, lastColumn);
+			}
+			// Check for LET
+			if (tokenNumber === Zx81Tokens.LET) {
+				// LET: Check for variable name to give an additional warning
+				this.checkVariableName();
+				// Otherwise handle as other requests
 			}
 			// Check for REM
 			if (tokenNumber === Zx81Tokens.REM) {

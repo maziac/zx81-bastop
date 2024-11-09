@@ -6,6 +6,8 @@ export class Diagnostics {
 	// The diagnostics collection.
 	private static readonly diagnosticCollection = vscode.languages.createDiagnosticCollection('ZX81 BASIC Converter');
 
+	// Array that holds the current diagnostics.
+	protected static messages: vscode.Diagnostic[] = [];
 
 	/** Set an error.
 	 * @param message The error message.
@@ -16,9 +18,10 @@ export class Diagnostics {
 	public static setError(message: string, uri: vscode.Uri, line: number, col: number) {
 		const range = new vscode.Range(line, col, line, col);
 		const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Error);
-		this.diagnosticCollection.set(uri, [diagnostic]);
+		this.messages.push(diagnostic);
+		this.diagnosticCollection.set(uri, this.messages);
 		// Bring the PROBLEMS pane to the front
-		vscode.commands.executeCommand('workbench.actions.view.problems');
+		vscode.commands.executeCommand('workbench.panel.markers.view.focus');
 	}
 
 	/** Set a warning.
@@ -30,14 +33,17 @@ export class Diagnostics {
 	public static setWarning(message: string, uri: vscode.Uri, line: number, col: number) {
 		const range = new vscode.Range(line, col, line, col);
 		const diagnostic = new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning);
-		this.diagnosticCollection.set(uri, [diagnostic]);   // Bring the PROBLEMS pane to the front
-		vscode.commands.executeCommand('workbench.actions.view.problems');
+		this.messages.push(diagnostic);
+		this.diagnosticCollection.set(uri, this.messages);
+		// Bring the PROBLEMS pane to the front
+		vscode.commands.executeCommand('workbench.panel.markers.view.focus');
 	}
 
 
 	/** Clear all diagnostics. */
 	public static clearDiagnostics() {
 		this.diagnosticCollection.clear();
+		this.messages = [];
 	}
 
 
