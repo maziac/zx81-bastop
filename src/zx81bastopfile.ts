@@ -25,6 +25,11 @@ export class Zx81BasToPfile extends EventEmitter {
 	// Regex to find the tokens (longest first).
 	protected remQuotedRegex: RegExp;
 
+	//Holds only the commands (0xE1-0xFF)
+	protected commandMap = new Map<string, number>();
+	// Regex to find the commands.
+	protected commandRegex: RegExp;
+
 	// Regex to find a \ continuation:
 	protected contRegex = /\\\s*\n/y;
 	//protected contRegex = /^\\\s*\n/;
@@ -100,6 +105,15 @@ export class Zx81BasToPfile extends EventEmitter {
 		}
 		this.normalRegex = this.createRegex(Array.from(this.normalMap.keys()));
 		this.remQuotedRegex = this.createRegex(Array.from(this.remQuotedMap.keys()));
+
+		// Create map only for BASIC commands
+		for (let i = 0xE1; i < 0x100; i++) {
+			const key = Zx81Tokens.convertToken(i);
+			this.commandMap.set(key, i);
+			// And bracketized
+			this.commandMap.set('[' + key.trim() + ']', i);
+		}
+		this.commandRegex = this.createSimpleRegex(Array.from(this.commandMap.keys()));
 	}
 
 
@@ -119,6 +133,24 @@ export class Zx81BasToPfile extends EventEmitter {
 	}
 	protected remQuotedMapGet(token: string): number {
 		return this.remQuotedMap.get(token.toUpperCase())!;
+	}
+	protected commandMapGet(token: string): number {
+		return this.commandMap.get(token.toUpperCase())!;
+	}
+
+
+	// Creates a regex from the tokens.
+	// Just exchanges ' ' with \s and also adds bracketized tokens
+	// Used for the commands.
+	protected createSimpleRegex(tokens: string[]): RegExp {
+		const replaced = tokens.map(s => {
+			const res = s.replace(/[[\]]/g, '\\$&');
+			return res;
+		});
+		const concatenated = replaced.join('|').replace(/ /g, '\\s');
+		const regexStr = '(' + concatenated + ')';
+		const regex = new RegExp(regexStr, 'iy');
+		return regex;
 	}
 
 
@@ -145,10 +177,10 @@ export class Zx81BasToPfile extends EventEmitter {
 				res = res.replace(/ $/, '[ \t]');	// Don't allow newline
 
 			return res;
-		})
+		});
 		let regexStr = replaced.join('|');
 		regexStr = '(' + regexStr + ')';
-		const regex= new RegExp(regexStr, 'iy');
+		const regex = new RegExp(regexStr, 'iy');
 		return regex;
 	}
 
@@ -711,17 +743,11 @@ export class Zx81BasToPfile extends EventEmitter {
 			this.skipSpacesAndCont();
 
 			// Check for first command
-			const lastColumn = this.colNr;
-			const token = this.readToken(this.normalRegex);
+			const token = this.readToken(this.commandRegex);
 			if (!token)
 				this.throwError("Unknown command");
-			const tokenNumber = this.normalMapGet(token);
+			const tokenNumber = this.commandMapGet(token);
 			this.basicCodeOut.push(tokenNumber);
-			// Check for BASIC commands
-			if (!Zx81Tokens.isCommand(tokenNumber)) {
-				// Spit out a warning
-				this.throwError("Command expected but got: '" + token + "'", this.lineNr, lastColumn);
-			}
 			// Check for DiM or LET
 			if (tokenNumber === Zx81Tokens.DIM || tokenNumber === Zx81Tokens.LET) {
 				// DIM/LET: Check for variable name to give an additional warning

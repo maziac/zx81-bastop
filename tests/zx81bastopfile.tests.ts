@@ -1158,7 +1158,7 @@ describe('Zx81BasToPfile', () => {
 		});
 
 		describe('errors', () => {
-			it('Command expected', () => {
+			it('Unknown command', () => {
 				const conv = new Zx81BasToPfile("10 PL OT") as any;
 				try {
 					conv.encodeBasic();
@@ -1166,7 +1166,7 @@ describe('Zx81BasToPfile', () => {
 					assert.fail();
 				}
 				catch (e) {
-					assert.ok(e.message.startsWith('Command expected'));
+					assert.ok(e.message.startsWith('Unknown command'));
 					assert.equal(e.line, 0);
 					assert.equal(e.column, 3);
 				}
@@ -1277,6 +1277,20 @@ describe('Zx81BasToPfile', () => {
 					0x1E,	// 2
 					0x1C,	// 0
 					// Rest (1+5 number + newline) skipped
+				]);
+			});
+		});
+
+		describe('misc', () => {
+			it('LOAD\n', () => {
+				const conv = new Zx81BasToPfile('20 LOAD\n') as any;
+				conv.encodeBasic();
+				const buf = conv.basicCodeOut;
+				assert.deepEqual(buf, [
+					0, 20,	// Line number
+					2, 0,	// Size
+					0xEF,	// LOAD
+					0x76	// Newline
 				]);
 			});
 		});

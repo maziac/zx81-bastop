@@ -85,13 +85,4 @@ export class Zx81Tokens {
 			txt = '[' + tokenNumber + ']';
 		return txt;
 	}
-
-
-	/** Returns true if the token is a BASIC command like PRINT, CLS, etc.
-	 * @param tokenNumber The token number.
-	 * @returns True if the token is a command.
-	 */
-	public static isCommand(tokenNumber: number): boolean {
-		return tokenNumber >= 0xE1 && tokenNumber <= 0xFF;
-	}
 }
