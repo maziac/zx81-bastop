@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 import {Zx81BasToPfile} from '../src/zx81bastopfile';
+import {warn} from 'console';
 
 /** Tests for the ZX81 Basic parser.
  */
@@ -1172,6 +1173,42 @@ describe('Zx81BasToPfile', () => {
 			});
 		});
 
+		describe('warnings', () => {
+			it('DIM', () => {
+				const conv = new Zx81BasToPfile("10 DIM GOTO(99)") as any;
+				let warningsCount = 0;
+				conv.on('warning', (msg, line, col) => {
+					assert.notEqual(msg, undefined);
+					assert.equal(line, 0);
+					assert.equal(col, 7);
+					warningsCount++;
+				});
+				conv.encodeBasic();
+				assert.equal(warningsCount, 1);
+			});
+			it('LET', () => {
+				const conv = new Zx81BasToPfile("10 LET   RND = 8") as any;
+				let warningsCount = 0;
+				conv.on('warning', (msg, line, col) => {
+					assert.notEqual(msg, undefined);
+					assert.equal(line, 0);
+					assert.equal(col, 9);
+					warningsCount++;
+				});
+				conv.encodeBasic();
+				assert.equal(warningsCount, 1);
+			});
+			it('several', () => {
+				const conv = new Zx81BasToPfile("10 LET RND=8 \n20 DIM PRINT(8)") as any;
+				let warningsCount = 0;
+				conv.on('warning', msg => {
+					warningsCount++;
+				});
+				conv.encodeBasic();
+				assert.equal(warningsCount, 2);
+			});
+		});
+
 		describe('nextLineOffset', () => {
 			it('empty comment header', () => {
 				const conv = new Zx81BasToPfile("#! \n10 PRINT") as any;
@@ -1533,6 +1570,65 @@ describe('Zx81BasToPfile', () => {
 			assert.equal(conv.colNr, 2);
 			assert.equal(conv.lineNr, 5);
 			assert.equal(conv.eos(), false);
+		});
+	});
+
+
+	describe('checkVariableName', () => {
+			it('DIM 1', () => {
+				const conv = new Zx81BasToPfile("10 DIM  PRINT(100)") as any;
+				conv.position = 7;
+				conv.lineNr = 0;
+				conv.colNr = 7;
+				let warningsCount = 0;
+				conv.on('warning', (msg, line, col) => {
+					assert.notEqual(msg, undefined);
+					assert.equal(line, 0);
+					assert.equal(col, 8);
+					warningsCount++;
+				});
+				conv.checkVariableName();
+				assert.equal(warningsCount, 1);
+			});
+			it('DIM 2', () => {
+				const conv = new Zx81BasToPfile("10 DIM PRINT (100)") as any;
+				conv.position = 7;
+				conv.lineNr = 0;
+				conv.colNr = 7;
+				let warningsCount = 0;
+				conv.on('warning', (msg, line, col) => {
+					assert.notEqual(msg, undefined);
+					assert.equal(line, 0);
+					assert.equal(col, 7);
+					warningsCount++;
+				});
+				conv.checkVariableName();
+				assert.equal(warningsCount, 1);
+			});
+			it('LET', () => {
+				const conv = new Zx81BasToPfile("10 let poke$") as any;
+				conv.position = 7;
+				conv.lineNr = 0;
+				conv.colNr = 7;
+				let warningsCount = 0;
+				conv.on('warning', (msg, line, col) => {
+					assert.notEqual(msg, undefined);
+					assert.equal(line, 0);
+					assert.equal(col, 7);
+					warningsCount++;
+				});
+				conv.checkVariableName();
+				assert.equal(warningsCount, 1);
+			});
+		it('not found', () => {
+			const conv = new Zx81BasToPfile("10 LET NOPROBLEM=5") as any;
+			conv.position = 7;
+			conv.lineNr = 0;
+			conv.colNr = 7;
+			let warningsCount = 0;;
+			conv.on('warning', msg => {warningsCount++});
+			conv.checkVariableName();
+			assert.equal(warningsCount, 0);
 		});
 	});
 });

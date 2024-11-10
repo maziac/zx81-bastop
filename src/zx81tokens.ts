@@ -8,6 +8,7 @@ export class Zx81Tokens {
 	public static readonly NEWLINE = 0x76;
 	public static readonly NUMBER = 0x7E;
 	public static readonly REM = 0xEA;
+	public static readonly DIM = 0xE9;
 	public static readonly LET = 0xF1;
 
 

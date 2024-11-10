@@ -48,6 +48,9 @@ export class Zx81BasToPfile extends EventEmitter {
 	// Regex for the comment header #! (for BASIC start line)
 	protected commentHdrRegex = /#![ \t]*(basic-start[ \t]*(=)?[ \t]*|dfile-collapsed\b|dfile:|basic-vars:[ \t]*|.*)?/iy;
 
+	// For finding problematic variable names.
+	protected regexVariableName = /([\t ]*)([A-Z][A-Z0-9]*)/iy;
+
 	// During encodeBasic() this buffer is filled with the basic code.
 	public basicCodeOut: number[] = [];
 
@@ -347,17 +350,18 @@ export class Zx81BasToPfile extends EventEmitter {
 	 * If it is a problematic name, a warning is shown.
 	 * Problematic names are names that are same as a BASIC command.
 	 */
-	protected regexVariableName = /[\t ]*([A-Z][A-Z0-9]*)/iy;
 	protected checkVariableName() {
 		this.regexVariableName.lastIndex = this.position;
 		const result = this.regexVariableName.exec(this.str);
 		if (!result)
 			this.throwError('Variable name expected');
 		// Compare variable name with BASIC commands
-		const varName = result[1];
+		const varName = result[2];
 		const tokenNumber = this.normalMapGet('[' + varName + ']');
 		if (tokenNumber !== undefined) {
-			this.showWarning("Variable name '" + varName + "' is same as a BASIC command. This may or may not be a problem. To be on the safe side better rename it.");
+			const trailingSpaces = result[1];
+			const colNr = this.colNr + trailingSpaces.length;
+			this.showWarning("Variable name '" + varName + "' is same as a BASIC command. This may or may not be a problem. To be on the safe side better rename it.", this.lineNr, colNr);
 		}
 		return;
 	}
@@ -718,9 +722,9 @@ export class Zx81BasToPfile extends EventEmitter {
 				// Spit out a warning
 				this.throwError("Command expected but got: '" + token + "'", this.lineNr, lastColumn);
 			}
-			// Check for LET
-			if (tokenNumber === Zx81Tokens.LET) {
-				// LET: Check for variable name to give an additional warning
+			// Check for DiM or LET
+			if (tokenNumber === Zx81Tokens.DIM || tokenNumber === Zx81Tokens.LET) {
+				// DIM/LET: Check for variable name to give an additional warning
 				this.checkVariableName();
 				// Otherwise handle as other requests
 			}
