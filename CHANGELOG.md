@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.1.2
+- Recognition loosened if shown float value is different to stored one
+
 # 1.1.1
 - Warnings added for problematic variables such as "LET PRINT=1".
 - Focus to PROBLEM pane fixed.

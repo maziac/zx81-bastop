@@ -2,7 +2,7 @@
     "name": "zx81-bastop",
     "displayName": "A ZX81 BASIC to P-File Converter and a Viewer for P-Files",
     "description": "The extension does 2 things: A) It can convert ZX81 .bas files containing ZX81 BASIC into .p files and B) it is a viewer for ZX81 p-file contents. Showing the BASIC program and the screen (dfile) contents. It can view .P, .O and .P81 files. It can also extract the BASIC program from the file as text.",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "publisher": "maziac",
     "author": {
         "name": "Thomas Busse"

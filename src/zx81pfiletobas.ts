@@ -51,7 +51,7 @@ export class Zx81PfileToBas {
 						// Find digits belonging to the number
 						const txtNumberStr = this.getLastNumber(txt);
 						const txtNumber = parseFloat(txtNumberStr);
-						if (isNaN(txtNumber) || (Math.abs(txtNumber - value) > 1e-10)) {
+						if (isNaN(txtNumber) || (Math.abs(txtNumber - value) > 1e-6)) {
 							// If digits are not the same as the value or they are not a real number then print the real value as comment
 							txt += '[#' + value + ']';
 						}
