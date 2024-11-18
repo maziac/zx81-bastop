@@ -1,5 +1,6 @@
 import exp = require("constants");
 import {Zx81Tokens} from "./zx81tokens";
+import {Zx81SystemVars} from "./zx81systemvars";
 
 
 export class Zx81PfileToBas {
@@ -114,6 +115,7 @@ export class Zx81PfileToBas {
 	 * - the value of the next BASIC program line (nxtlin)
 	 * - the D-File area (the screen)
 	 * - the BASIC variables
+	 * - the system variables
 	 * See design/ptobasconversion.md.
 	 * @param data The data of the p-file.
 	 * @returns The text for the comment header.
@@ -170,10 +172,9 @@ export class Zx81PfileToBas {
 			dfileLines = dfileLines.replace(/^/mg, '#!dfile:');
 			// Remove trailing spaces from each line
 			dfileLines = dfileLines.replace(/ *$/mg, '');
-			dfileLines += '\n';
+			dfileLines += '\n\n';
+			hdr += dfileLines;
 		}
-		dfileLines += '\n';
-		hdr += dfileLines;
 
 		// BASIC variables
 		if (basicVarsSize > 1) {
@@ -183,6 +184,28 @@ export class Zx81PfileToBas {
 				// Use chunks of a few bytes
 				const block = vars.slice(i, i + blockSize);
 				hdr += '#!basic-vars:[' + block.join(',') + ']\n';
+			}
+			hdr += '\n';
+		}
+
+		// System Variables
+		const defaultSysVars = new Zx81SystemVars();
+		defaultSysVars.createDefaults();
+		const diffs = defaultSysVars.compare(data);
+		if (diffs.size > 0) {
+			for (const [name, values] of diffs) {
+				switch (values.length) {
+					case 1:
+						hdr += `#!sys-var:${name}=${values[0]}`;
+						break;
+					case 2:
+						hdr += `#!sys-var:${name}=${values[0] + 256 * values[1]}`;
+						break;
+					default:
+						hdr += `#!sys-var:${name}=[${values.join(',')}]`;
+						break;
+				}
+				hdr += '\n';
 			}
 			hdr += '\n';
 		}

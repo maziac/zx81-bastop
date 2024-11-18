@@ -110,9 +110,9 @@ export class Zx81SystemVars {
 			0xBC, // PR_CC
 			0x21, 0x18, // S_POSN
 			0x40, // CDFLAG
-			...Array(32).fill(0x20), // PRBUFF (32 spaces)
-			0x0A, // Newline
-			...Array(30).fill(0x00), // MEMBOT (30 zeros)
+			...Array(32).fill(0), // PRBUFF (32 spaces)
+			0x76, // Newline
+			...Array(30).fill(0), // MEMBOT (30 zeros)
 			0x00, 0x00 // UNUSED2
 		]);
 	}
@@ -192,20 +192,28 @@ export class Zx81SystemVars {
 
 	/** Compares with another system variables object and returns the diff.
 	 * @param other The other system variables object to compare with.
-	 * @returns A map with the differences: key = name, value = value (of this).
+	 * @returns A map with the differences: key = name, values = values (of other).
 	 */
-	public compare(other: Zx81SystemVars): Map<string, number> {
+	public compare(other: Uint8Array): Map<string, Uint8Array> {
 		// Values to skip during compare
 		const skipNames = ["D_FILE", "DF_CC", "VARS", "E_LINE", "CH_ADD", "STKBOT", "STKEND", "NXTLIN"];
 
-		const diffs: Map<string, number> = new Map();
+		const diffs: Map<string, Uint8Array> = new Map();
 		for (const [name, {address, size}] of Object.entries(this.sysVarsNames)) {
 			if (skipNames.includes(name))
 				continue;
-			const value = this.getSysVarAtAddr(address);
-			const otherValue = other.getSysVarAtAddr(address);
-			if (value !== otherValue)
-				diffs.set(name, value);
+			const index = address - 16393;
+			let equal = true;
+			for (let i = index; i < index + size; i++) {
+				if (this.sysVarsValues[i] !== other[i]) {
+					equal = false;
+					break;
+				}
+			}
+			if (!equal) {
+				const values = other.slice(index, index + size);
+				diffs.set(name, values);
+			}
 		}
 		return diffs;
 	}
