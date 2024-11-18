@@ -88,12 +88,16 @@ This information is put in comments that use an exclamation mark as 2nd characte
   ~~~
   There can be many `#!basic-vars:`lines or none (if there was no variable used). All bytes are encoded as simple decimal number.
   The trailing 128 is excluded.
+- ZX81 System Variables: Some of the system variables are also put in the comment header.
+  Variables are only put here if they are different from the default value that would be used anyhow in a bas to p conversion.
+  And, of course, variables that depend on the BASIC itself (e.g. the BASIC program length) are also not added.
+  Other variables appear with the suffix `#!system-vars:` followed by the variable name and it's value, e.g. `#!system-vars: XXX=6`
 
 The comment header will be put at the start of the file by the p to bas conversion.
 However, when converting the bas to a p-file the comment header lines can be everywhere, although it makes sense to keep them together at the start o the file.
 
 This here is a valid comment header:
-~~~c
+~~~
 # The line where the BASIC program will start:
 #!basic-start=100
 
@@ -136,7 +140,7 @@ Important things to note:
 - Spaces at the end of a line are ignored. So, a p-file converted to .bas and back to p-file can have a different size. The p-file converter will add spaces if the original has spaces but an editor might cut them off anyway.
 - In REM-lines all codes will have a translation. Spaces at the end of a line are relevant. Therefore the p-file converter converts the last space as "[0]" to prevent that an editor cuts them off.
 - The tokens are checked with the longest tokens first. This is to prevent that e.g. "<>" is not recognized as "<" and ">" but as a single code.
-- REM and Quoted strings: Tokens in quoted strings can be ambiguous. E.g. "STOP" could have been originally a single code (0xE3) or it was compounded from "S" "T" "O" "P". There is no way to tell. The 'convert' function will convert it as single characters.
+- REM and quoted strings: Tokens in quoted strings can be ambiguous. E.g. "STOP" could have been originally a single code (0xE3) or it was compounded from "S" "T" "O" "P". There is no way to tell. The 'convert' function will convert it as single characters.
 - However, the p to bas conversion will put those tokens in brackets (e.g. "[STOP]"). REM lines you often find machine code. The tokens in brackets gurantee that when converting the bas file  to a p-file that the code can be 100% reconstructed.
   Here are some examples for otherwise ambiguous strings: <>, <=, >=, **, RND, INKEY$, PI, AT to COPY
 

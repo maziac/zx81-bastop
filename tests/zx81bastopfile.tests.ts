@@ -1293,6 +1293,23 @@ describe('Zx81BasToPfile', () => {
 					0x76	// Newline
 				]);
 			});
+
+			it('REM [!include file]', () => {
+				const conv = new Zx81BasToPfile('10 REM [!include file-1.bin]') as any;
+				conv.setReadFileFunction((filename: string) => {
+					assert.equal(filename, 'file-1.bin');
+					return [1, 2, 3];
+				});
+				conv.encodeBasic();
+				const buf = conv.basicCodeOut;
+				assert.deepEqual(buf, [
+					0, 10,	// Line number
+					5, 0,	// Size
+					0xEA,	// REM
+					1, 2, 3,	// file.bin
+					0x76	// Newline
+				]);
+			});
 		});
 	});
 

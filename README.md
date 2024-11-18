@@ -113,6 +113,9 @@ E.g. use:
 
 to convert `myprgm.bas` to `myprgm.p`.
 
+# More Info
+More infromation about the internals can be found [here](https://github.com/maziac/zx81-bastop/blob/main/design/ptobasconversion.md).
+
 # Recommended Other Extensions
 - [ZX81-Basic](https://marketplace.visualstudio.com/items?itemName=WilsonPilon.zx81basic): ZX81 BASIC Syntax Highlighting
 - [DeZog](https://marketplace.visualstudio.com/items?itemName=maziac.dezog): Z80 (ZX81) Machine Code Debugger to run the P-Files inside VSCode.
