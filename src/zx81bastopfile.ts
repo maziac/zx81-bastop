@@ -1,5 +1,6 @@
 import {EventEmitter} from "stream";
 import {Zx81Tokens} from "./zx81tokens";
+import {Zx81SystemVars} from "./zx81systemvars";
 
 
 /** Converts the ZX81 BASIC file to code.
@@ -48,7 +49,7 @@ export class Zx81BasToPfile extends EventEmitter {
 	protected regexInt = /\d+/y
 
 	// Regex for special codes e.g. [#size=100], [#include folder/file.obj] or a simple number [123].
-	protected specialCodeRegex = /\[(#.*?|\d+|!block\s*=\s*(\d+)\s*|!include\s+([\w./ ]+)\s*)\]/iy;
+	protected specialCodeRegex = /\[(#.*?|\d+|!block\s*=\s*(\d+)\s*|!include\s+([\w./ -]+)\s*)\]/iy;
 
 	// Regex for the comment header #! (for BASIC start line)
 	protected commentHdrRegex = /#![ \t]*(basic-start[ \t]*(=)?[ \t]*|dfile-collapsed\b|dfile:|basic-vars:[ \t]*|.*)?/iy;
@@ -812,59 +813,18 @@ export class Zx81BasToPfile extends EventEmitter {
 			nextLineAddr = basicProgram + this.nextLineOffset;
 		}
 
-		// Create sysvars
-		const sysvars = new Uint8Array([
-			0x00, // VERSN
-			0x01, 0x00, // E_PPC
-			...this.wordToByte(dfilePtr), // D_FILE
-			...this.wordToByte(dfilePtr + 1), // DF_CC
-			...this.wordToByte(basicVars), // VARS
-			0x00, 0x00, // DEST
-			...this.wordToByte(basicEnd), // E_LINE
-			...this.wordToByte(basicEnd + 4), // CH_ADD
-			0x00, 0x00, // X_PTR
-			...this.wordToByte(basicEnd + 5), // STKBOT
-			...this.wordToByte(basicEnd + 5), // STKEND
-			0x00, // BREG
-			0x3D, 0x40, // MEM
-			0x00, // UNUSED1
-			0x02, // DF_SZ
-			0x02, 0x00, // S_TOP
-			0xBF, 0xFD, // LAST_K
-			0x0F, // DEBOUN
-			0x37, // MARGIN
-			...this.wordToByte(nextLineAddr), // NXTLIN (offset 32)
-			0x00, 0x00, // OLDPPC
-			0x00, // FLAGX
-			0x00, 0x00, // STRLEN
-			0x8D, 0x0C, // T_ADDR
-			0x00, 0x00, // SEED
-			0xA3, 0xF5, // FRAMES
-			0x00, 0x00, // COORDS
-			0xBC, // PR_CC
-			0x21, 0x18, // S_POSN
-			0x40, // CDFLAG
-			...Array(32).fill(0x20), // PRBUFF (32 spaces)
-			0x0A, // Newline
-			...Array(30).fill(0x00), // MEMBOT (30 zeros)
-			0x00, 0x00 // UNUSED2
-		]);
+		// Create sysVars
+		const sysVars = new Zx81SystemVars();
+		sysVars.createDefaults();
+		sysVars.setValues(dfilePtr, basicVars, basicEnd, nextLineAddr);
+		const sysVarsValues = sysVars.getValues();
 
 		// Concatenate to p-file
 		const pFile: number[] = [
-			...sysvars, ...this.basicCodeOut, ...dfileData, ...variables
+			...sysVarsValues, ...this.basicCodeOut, ...dfileData, ...variables
 		];
 
 		return pFile;
-	}
-
-
-	/** Converts a word into two bytes.
-	 * @param word The word to convert.
-	 * @returns The two bytes as [low, high].
-	 */
-	protected wordToByte(word: number): [number, number] {
-		return [word & 0xFF, word >> 8];
 	}
 
 
