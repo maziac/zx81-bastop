@@ -200,7 +200,7 @@ export function parsePfile() {
 		addRow('VERSN (0x4009)', getDecimalValue(), '8k ROM version.');
 
 		read(2);
-		addRow('E_PPC (0x400A)', getHex0xValue(), 'Number of current line.');
+		addRow('E_PPC (0x400A)', getDecimalValue(), 'Number of current line.');
 
 		read(2);
 		addRow('D_FILE (0x400C)', getHex0xValue(), 'pointer to the DFILE (screen memory).');
@@ -242,7 +242,7 @@ export function parsePfile() {
 		addRow('DF_SZ (0x4022)', getDecimalValue(), 'The number of lines (including one blank line) in the lower part of the screen.');
 
 		read(2);
-		addRow('S_TOP (0x4023)', getHex0xValue(), 'The number of the top program line in automatic listings.');
+		addRow('S_TOP (0x4023)', getDecimalValue(), 'The number of the top program line in automatic listings.');
 
 		read(2);
 		addRow('LAST_K (0x4025)', getHex0xValue(), 'Shows which keys pressed.');
@@ -257,7 +257,7 @@ export function parsePfile() {
 		addRow('NXTLIN (0x4029)', getHex0xValue(), 'Address of next program line to be executed.');
 
 		read(2);
-		addRow('OLDPPC (0x402B)', getHex0xValue(), 'Line number of which CONT jumps.');
+		addRow('OLDPPC (0x402B)', getDecimalValue(), 'Line number of which CONT jumps.');
 
 		read(1);
 		addRow('FLAGX (0x402D)', getHex0xValue(), 'Various flags.');
@@ -272,7 +272,7 @@ export function parsePfile() {
 		addRow('SEED (0x4032)', getHex0xValue(), 'The seed for RND. This is the variable that is set by RAND.');
 
 		read(2);
-		addRow('FRAMES (0x4034)', getHex0xValue(), 'Counts the frames displayed on the television. Bit 15 is 1. Bits 0 to 14 are decremented for each frame set to the television.');
+		addRow('FRAMES (0x4034)', getDecimalValue(), 'Counts the frames displayed on the television. Bit 15 is 1. Bits 0 to 14 are decremented for each frame set to the television.');
 
 		read(1);
 		addRow('COORDS (0x4036)', getDecimalValue(), 'x-coordinate of last point PLOTted.');
