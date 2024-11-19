@@ -709,19 +709,24 @@ export class Zx81BasToPfile extends EventEmitter {
 		this.colNr += len;
 
 		// Next is the value or the array of values
-		let buf;
+		let bufValue: number | number[];
 		if (this.testReadChar() === '[') {
 			// Read array
-			buf = this.readArrayValues();
+			bufValue = this.readArrayValues();
 		}
 		else {
 			// Read single value
-			const value = this.readInt(0, 0xFFFF);
-			buf = [ value &0xFF, value >> 8 ];
+			bufValue = this.readInt(0, 0xFFFF);
 		}
 
 		const sysVarName = match[1];
-		this.systemVariablesOut.setSysVarAtAddr(sysVarName, buf);
+		try {
+			this.systemVariablesOut.setSysVarAtAddr(sysVarName, bufValue);
+		}
+		catch (err) {
+			// Put in Zx81ParseError
+			this.throwError(`Error setting system variable '${sysVarName}': ${err.message}`);
+		}
 	}
 
 

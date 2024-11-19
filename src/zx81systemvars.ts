@@ -159,7 +159,7 @@ export class Zx81SystemVars {
 		if (typeof addr === 'number') {
 			const addrName = this.sysVarsAddresses.get(addr);
 			if (addrName === undefined)
-				throw Error(`Invalid system variable address ${addr}.`);
+				throw Error('Invalid system variable address.');
 			addr = addrName as string;
 		}
 		// Get info for sys variable
@@ -170,14 +170,14 @@ export class Zx81SystemVars {
 		// Check value type
 		if (typeof value === 'number') {
 			const highValue = value >> 8;
-			value = [value & 0xFF];
 			if (size === 1 && highValue !== 0)
-				throw Error(`Invalid value for system variable ${addr}: ${value}. Expected a byte but got a word.`);
+				throw Error(`Invalid value: ${value}. Expected a byte but got a word.`);
+			value = [value & 0xFF];
 			if (size > 1)
 				value.push(highValue);
 		}
 		if (value.length !== size)
-			throw Error(`Invalid value for system variable ${addr}: ${value}. Expected ${size} bytes but got only ${value.length}.`);
+			throw Error(`Invalid value: ${value}. Expected ${size} byte(s) but got ${value.length}.`);
 		let minSize = Math.min(value.length, size);
 		for (let i = 0; i < minSize; i++) {
 			this.sysVarsValues[index++] = value[i];
