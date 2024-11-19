@@ -1,7 +1,8 @@
 # Changelog
 
-# 1.1.2
+# 1.2.0
 - Recognition loosened if shown float value is different to stored one
+- Right-click conversion to p file fixed.
 
 # 1.1.1
 - Warnings added for problematic variables such as "LET PRINT=1".

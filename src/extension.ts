@@ -54,7 +54,10 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     // Command to convert a ZX81 BASIC text file into a P-file.
-    context.subscriptions.push(vscode.commands.registerCommand('zx81-bastop.convertbastop', async (fileUri: vscode.Uri, outUri: vscode.Uri | undefined) => {
+    // If command is executed from a right click in the explorer parameter 1 and 2, both contain the file path.
+    // The 2nd parameter embedded in an array.
+    // Therefore, parameter 2 is ignored.
+    context.subscriptions.push(vscode.commands.registerCommand('zx81-bastop.convertbastop', async (fileUri: vscode.Uri, _p2, outUri: vscode.Uri | undefined) => {
         //console.log(`zx81-bastop.convertbastop: file=${fileUri}, out=${outUri}`);
         await convertBasToP(fileUri, outUri);
     }));
@@ -191,7 +194,7 @@ async function basRun(fileUri: vscode.Uri, memoryModel: string) {
 }
 
 
-/** Creates a task to convert a BASSIC file to a p-file.
+/** Creates a task to convert a BASIC file to a p-file.
  * Task parameters:
  * file: The *.bas file to convert
  * out: The output file name for the p-file.
@@ -227,7 +230,7 @@ function getZx81BastopTask(task: vscode.Task): vscode.Task {
                     onDidClose: closeEmitter.event,
                     open: async () => {
                         try {
-                            await vscode.commands.executeCommand('zx81-bastop.convertbastop', fileUri, outUri);
+                            await vscode.commands.executeCommand('zx81-bastop.convertbastop', fileUri, undefined, outUri);
                             writeEmitter.fire('Conversion complete.\r\n');
                             closeEmitter.fire(0);
                         } catch (error) {
