@@ -19,7 +19,7 @@
 export class Zx81SystemVars {
 
 	// Object with all addresses and sizes of the system variables.
-	protected readonly sysVarsNames = {
+	protected sysVarsNames = {
 		"VERSN": { address: 16393, size: 1 },
 		"E_PPC": { address: 16394, size: 2 },
 		"D_FILE": { address: 16396, size: 2 },
@@ -68,13 +68,19 @@ export class Zx81SystemVars {
 		for (const [name, {address}] of Object.entries(this.sysVarsNames)) {
 			this.sysVarsAddresses.set(address, name);
 		}
-		// TODO: Add also address numbers to sysVarsNames + tests
+		// Add same entries for numbers
+		const sysVarNamesArray = Object.keys(this.sysVarsNames);
+		for (const name of sysVarNamesArray) {
+			const info = this.sysVarsNames[name];
+			const addressStr = info.address.toString();
+			this.sysVarsNames[addressStr] = info;
+		}
 	}
 
 
 	/** Return the array with the values. */
-	public getValues(): Uint8Array {
-		return this.sysVarsValues;
+	public getValues(): number[] {
+		return Array.from(this.sysVarsValues);
 	}
 
 

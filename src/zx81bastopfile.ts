@@ -649,7 +649,7 @@ export class Zx81BasToPfile extends EventEmitter {
 					this.handleBasicVars();
 				}
 				else if (cmd.startsWith('system-vars')) {
-					this.handleBasicVars();
+					this.handleSystemVars();
 				}
 				else if (cmd !== '') {
 					// Something unknown, correct position
@@ -710,13 +710,14 @@ export class Zx81BasToPfile extends EventEmitter {
 
 		// Next is the value or the array of values
 		let buf;
-		if (this.testReadChar() !== '[') {
+		if (this.testReadChar() === '[') {
 			// Read array
 			buf = this.readArrayValues();
 		}
 		else {
 			// Read single value
-			buf = [this.readInt(0, 0xFFFF)];
+			const value = this.readInt(0, 0xFFFF);
+			buf = [ value &0xFF, value >> 8 ];
 		}
 
 		const sysVarName = match[1];
@@ -871,11 +872,9 @@ export class Zx81BasToPfile extends EventEmitter {
 			nextLineAddr = basicProgram + this.nextLineOffset;
 		}
 
-		// Create sysVars
-		const sysVars = new Zx81SystemVars();
-		sysVars.createDefaults();
-		sysVars.setValues(dfilePtr, basicVars, basicEnd, nextLineAddr);
-		const sysVarsValues = sysVars.getValues();
+		// Add BASIC dependent sysVars
+		this.systemVariablesOut.setValues(dfilePtr, basicVars, basicEnd, nextLineAddr);
+		const sysVarsValues = this.systemVariablesOut.getValues();
 
 		// Concatenate to p-file
 		const pFile: number[] = [
