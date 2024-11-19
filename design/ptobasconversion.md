@@ -91,7 +91,8 @@ This information is put in comments that use an exclamation mark as 2nd characte
 - ZX81 System Variables: Some of the system variables are also put in the comment header.
   Variables are only put here if they are different from the default value that would be used anyhow in a bas to p conversion.
   And, of course, variables that depend on the BASIC itself (e.g. the BASIC program length) are also not added.
-  Other variables appear with the suffix `#!system-vars:` followed by the variable name and it's value, e.g. `#!system-vars: XXX=6`
+  Other variables appear with the suffix `#!system-vars:` followed by the variable name and it's value, e.g. `#!system-vars: DF_SZ=0`
+  The length of the data (byte, word or array) is determined by the system variable. E.g. DF_SZ expects a byte, E_PPC expects a word and MEMBOT expects and array (e.g. '[4,46,125,6]').
 
 The comment header will be put at the start of the file by the p to bas conversion.
 However, when converting the bas to a p-file the comment header lines can be everywhere, although it makes sense to keep them together at the start o the file.

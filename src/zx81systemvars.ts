@@ -169,8 +169,15 @@ export class Zx81SystemVars {
 		let index = address - 16393;
 		// Check value type
 		if (typeof value === 'number') {
-			value = [value & 0xFF, value >> 8];
+			const highValue = value >> 8;
+			value = [value & 0xFF];
+			if (size === 1 && highValue !== 0)
+				throw Error(`Invalid value for system variable ${addr}: ${value}. Expected a byte but got a word.`);
+			if (size > 1)
+				value.push(highValue);
 		}
+		if (value.length !== size)
+			throw Error(`Invalid value for system variable ${addr}: ${value}. Expected ${size} bytes but got only ${value.length}.`);
 		let minSize = Math.min(value.length, size);
 		for (let i = 0; i < minSize; i++) {
 			this.sysVarsValues[index++] = value[i];
