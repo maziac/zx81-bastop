@@ -194,15 +194,16 @@ export class Zx81PfileToBas {
 		const diffs = defaultSysVars.compare(data);
 		if (diffs.size > 0) {
 			for (const [name, values] of diffs) {
+				hdr += `#!system-vars:${name}=`;
 				switch (values.length) {
 					case 1:
-						hdr += `#!sys-var:${name}=${values[0]}`;
+						hdr += values[0];
 						break;
 					case 2:
-						hdr += `#!sys-var:${name}=${values[0] + 256 * values[1]}`;
+						hdr += values[0] + 256 * values[1];
 						break;
 					default:
-						hdr += `#!sys-var:${name}=[${values.join(',')}]`;
+						hdr += `[${values.join(',')}]`;
 						break;
 				}
 				hdr += '\n';

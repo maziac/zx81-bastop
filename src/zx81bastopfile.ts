@@ -52,7 +52,10 @@ export class Zx81BasToPfile extends EventEmitter {
 	protected specialCodeRegex = /\[(#.*?|\d+|!block\s*=\s*(\d+)\s*|!include\s+([\w./ -]+)\s*)\]/iy;
 
 	// Regex for the comment header #! (for BASIC start line)
-	protected commentHdrRegex = /#![ \t]*(basic-start[ \t]*(=)?[ \t]*|dfile-collapsed\b|dfile:|basic-vars:[ \t]*|.*)?/iy;
+	protected commentHdrRegex = /#![ \t]*(basic-start[ \t]*(=)?[ \t]*|dfile-collapsed\b|dfile:|basic-vars:[ \t]*|system-vars:[ \t]*|.*)?/iy;
+
+	// Regex for system vars: name = value
+	protected systemVarsRegex = /(\w+)[ \t]*=[ \t]*/iy;
 
 	// For finding problematic variable names.
 	protected regexVariableName = /([\t ]*)([A-Z][A-Z0-9]*)/iy;
@@ -65,6 +68,9 @@ export class Zx81BasToPfile extends EventEmitter {
 
 	// During encodeBasic() this buffer is filled with BASIC variables.
 	public basicVariablesOut: number[] = [];
+
+	// During encodeBasic() this buffer is filled with the system variables.
+	public systemVariablesOut: Zx81SystemVars;
 
 	// The line where the BASIC program will continue.
 	// -1 if the program should start stopped.
@@ -115,6 +121,10 @@ export class Zx81BasToPfile extends EventEmitter {
 			this.commandMap.set('[' + key.trim() + ']', i);
 		}
 		this.commandRegex = this.createSimpleRegex(Array.from(this.commandMap.keys()));
+
+		// System variables
+		this.systemVariablesOut = new Zx81SystemVars();
+		this.systemVariablesOut.createDefaults();
 	}
 
 
@@ -607,6 +617,7 @@ export class Zx81BasToPfile extends EventEmitter {
 	 * #!dfile-collapsed
 	 * #!dfile:  WORLD
 	 * #!basic-vars:[1,2,3,4]
+	 * #!system-vars:name=value or name=[value1,value2]
 	 */
 	protected parseCommentHeader(): boolean {
 		this.commentHdrRegex.lastIndex = this.position;
@@ -635,6 +646,9 @@ export class Zx81BasToPfile extends EventEmitter {
 					this.handleDfile();
 				}
 				else if (cmd.startsWith('basic-vars')) {
+					this.handleBasicVars();
+				}
+				else if (cmd.startsWith('system-vars')) {
 					this.handleBasicVars();
 				}
 				else if (cmd !== '') {
@@ -674,6 +688,48 @@ export class Zx81BasToPfile extends EventEmitter {
 	protected handleBasicVars() {
 		if (this.testReadChar() !== '[')
 			this.throwError('Expected [');
+		const buf = this.readArrayValues();
+		this.basicVariablesOut.push(...buf);
+	}
+
+
+	/** Handles the 'system-vars:' command in the comment header.
+	 * Reads the BASIC variables and stores them in the basicVariablesOut array.
+	 */
+	protected handleSystemVars() {
+		// Next is the system variable name or address
+		this.systemVarsRegex.lastIndex = this.position;
+		const match = this.systemVarsRegex.exec(this.str);
+		if (!match)
+			this.throwError('Expected system variable name (or address).');
+
+		// Proceed
+		const len = match[0].length;
+		this.position += len;
+		this.colNr += len;
+
+		// Next is the value or the array of values
+		let buf;
+		if (this.testReadChar() !== '[') {
+			// Read array
+			buf = this.readArrayValues();
+		}
+		else {
+			// Read single value
+			buf = [this.readInt(0, 0xFFFF)];
+		}
+
+		const sysVarName = match[1];
+		this.systemVariablesOut.setSysVarAtAddr(sysVarName, buf);
+	}
+
+
+	/** Reads in array values, e.g. [4,6,123]
+	 * Assumes that at the current position there is a '['.
+	 * @returns The array of values.
+	*/
+	protected readArrayValues(): number[] {
+		const buf: number[] = [];
 		this.position++;
 		this.colNr++;
 		this.readRegex(this.regexSpaces);
@@ -681,7 +737,7 @@ export class Zx81BasToPfile extends EventEmitter {
 			const value = this.readInt(0, 255);
 			if (value === undefined)
 				this.throwError('Number expected');
-			this.basicVariablesOut.push(value);
+			buf.push(value);
 			this.readToken(this.regexSpaces);
 			const char = this.testReadChar();
 			if (char === '\n')
@@ -697,6 +753,8 @@ export class Zx81BasToPfile extends EventEmitter {
 		// Position after ']'
 		this.position++;
 		this.colNr++;
+
+		return buf;
 	}
 
 
@@ -807,7 +865,7 @@ export class Zx81BasToPfile extends EventEmitter {
 		const basicVarsSize = variables.length;
 		const basicEnd = basicVars + basicVarsSize;
 
-		// Caclulate nextlin Address
+		// Calculate nextlin Address
 		let nextLineAddr = dfilePtr; // Assume program is stopped
 		if (this.nextLineOffset >= 0) {
 			nextLineAddr = basicProgram + this.nextLineOffset;

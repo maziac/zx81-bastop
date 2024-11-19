@@ -68,6 +68,7 @@ export class Zx81SystemVars {
 		for (const [name, {address}] of Object.entries(this.sysVarsNames)) {
 			this.sysVarsAddresses.set(address, name);
 		}
+		// TODO: Add also address numbers to sysVarsNames + tests
 	}
 
 
@@ -143,11 +144,11 @@ export class Zx81SystemVars {
 
 
 	/** Sets a system variable at a specific address.
-	 * @param addr - The name or address of the system variable
-	 * @param word - The 8 or 16-bit word value to set at the specified address
-	 * It depends on the system variable size if 8 or 16 bit are set.
+	 * @param addr The name or address of the system variable
+	 * @param value An 8 or 16 bit value or a buffer with many values.
+	 * It depends on the system variable size how long the size of the written data is.
 	 */
-	protected setSysVarAtAddr(addr: number | string, word: number) {
+	public setSysVarAtAddr(addr: number | string, value: number | number[]) {
 		// Convert to string if number
 		if (typeof addr === 'number') {
 			const addrName = this.sysVarsAddresses.get(addr);
@@ -156,13 +157,18 @@ export class Zx81SystemVars {
 			addr = addrName as string;
 		}
 		// Get info for sys variable
-		const sysVarinfo = this.sysVarsNames[addr]!;
-		const address = sysVarinfo.address;
-		const size = sysVarinfo.size;
-		const index = address - 16393;
-		this.sysVarsValues[index] = word & 0xFF;
-		if(size > 1)
-			this.sysVarsValues[index + 1] = word >> 8;
+		const sysVarInfo = this.sysVarsNames[addr]!;
+		const address = sysVarInfo.address;
+		const size = sysVarInfo.size;
+		let index = address - 16393;
+		// Check value type
+		if (typeof value === 'number') {
+			value = [value & 0xFF, value >> 8];
+		}
+		let minSize = Math.min(value.length, size);
+		for (let i = 0; i < minSize; i++) {
+			this.sysVarsValues[index++] = value[i];
+		}
 	}
 
 
