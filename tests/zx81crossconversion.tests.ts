@@ -439,5 +439,43 @@ describe('Zx81 Cross Conversion', () => {
 			assert.equal(dfileCount, 4);
 			assert.equal(txt, "#!dfile-collapsed\n#!dfile:\n#!dfile:\n#!dfile: 0\n#!dfile:  1\n\n");
 		});
+
+		it('sysvars, DF_SZ', () => {
+			const conv = new Zx81BasToPfile("1 REM\n") as any;
+			conv.dfileCollapsed = true;
+			conv.dfileOut = [[]];
+			conv.basicVariablesOut = [];
+			conv.systemVariablesOut.setSysVarAtAddr("DF_SZ", 200);
+			const pfile = conv.createPfile();
+			const txt = (Zx81PfileToBas as any).getCommentHeader(pfile);
+			assert.ok(txt.includes('#!system-vars:'));
+			assert.ok(txt.includes('#!system-vars:DF_SZ=200'));
+		});
+		it('sysvars, FRAMES', () => {
+			const conv = new Zx81BasToPfile("1 REM\n") as any;
+			conv.dfileCollapsed = true;
+			conv.dfileOut = [[]];
+			conv.basicVariablesOut = [];
+			conv.systemVariablesOut.setSysVarAtAddr("FRAMES", 12345);
+			const pfile = conv.createPfile();
+			const txt = (Zx81PfileToBas as any).getCommentHeader(pfile);
+			assert.ok(txt.includes('#!system-vars:'));
+			assert.ok(txt.includes('#!system-vars:FRAMES=12345'));
+		});
+		it('sysvars, MEMBOT', () => {
+			const conv = new Zx81BasToPfile("1 REM\n") as any;
+			conv.dfileCollapsed = true;
+			conv.dfileOut = [[]];
+			conv.basicVariablesOut = [];
+			conv.systemVariablesOut.setSysVarAtAddr("MEMBOT", [
+				1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+				11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+				21, 22, 23, 24, 25, 26, 27, 28, 29, 30
+			]);
+			const pfile = conv.createPfile();
+			const txt = (Zx81PfileToBas as any).getCommentHeader(pfile);
+			assert.ok(txt.includes('#!system-vars:'));
+			assert.ok(txt.includes('#!system-vars:MEMBOT=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]'));
+		});
 	});
 });
