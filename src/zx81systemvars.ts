@@ -68,13 +68,6 @@ export class Zx81SystemVars {
 		for (const [name, {address}] of Object.entries(this.sysVarsNames)) {
 			this.sysVarsAddresses.set(address, name);
 		}
-		// Add same entries for numbers
-		const sysVarNamesArray = Object.keys(this.sysVarsNames);
-		for (const name of sysVarNamesArray) {
-			const info = this.sysVarsNames[name];
-			const addressStr = info.address.toString();
-			this.sysVarsNames[addressStr] = info;
-		}
 	}
 
 
@@ -149,6 +142,24 @@ export class Zx81SystemVars {
 	}
 
 
+	// Returns the SysVarInfo for a system variable.
+	// name can also be an address (number) as string.
+	protected getSysVarInfo(name: string): {address: number, size: number} {
+		// Get info for sys variable
+		let sysVarInfo = this.sysVarsNames[name];
+		if (!sysVarInfo) {
+			const address = parseInt(name);
+			if (isNaN(address))
+				throw Error(`Invalid system variable name: ${name}.`);
+			const addrName = this.sysVarsAddresses.get(address);
+			if (addrName === undefined)
+				throw Error(`Invalid system variable address: ${name}.`);
+			sysVarInfo = this.sysVarsNames[addrName]!;
+		}
+		return sysVarInfo;
+	}
+
+
 	/** Sets a system variable at a specific address.
 	 * @param addr The name or address of the system variable
 	 * @param value An 8 or 16 bit value or a buffer with many values.
@@ -163,7 +174,7 @@ export class Zx81SystemVars {
 			addr = addrName as string;
 		}
 		// Get info for sys variable
-		const sysVarInfo = this.sysVarsNames[addr]!;
+		const sysVarInfo = this.getSysVarInfo(addr);
 		const address = sysVarInfo.address;
 		const size = sysVarInfo.size;
 		let index = address - 16393;
@@ -198,9 +209,9 @@ export class Zx81SystemVars {
 			addr = addrName as string;
 		}
 		// Get info for sys variable
-		const sysVarinfo = this.sysVarsNames[addr]!;
-		const address = sysVarinfo.address;
-		const size = sysVarinfo.size;
+		const sysVarInfo = this.getSysVarInfo(addr);
+		const address = sysVarInfo.address;
+		const size = sysVarInfo.size;
 		const index = address - 16393;
 		let word = this.sysVarsValues[index];
 		if (size > 1)

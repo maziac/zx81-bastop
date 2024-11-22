@@ -439,6 +439,5 @@ describe('Zx81 Cross Conversion', () => {
 			assert.equal(dfileCount, 4);
 			assert.equal(txt, "#!dfile-collapsed\n#!dfile:\n#!dfile:\n#!dfile: 0\n#!dfile:  1\n\n");
 		});
-
 	});
 });

@@ -16,11 +16,13 @@ describe('Zx81SystemVars', () => {
 
 	describe('methods', () => {
 		let sysVars: Zx81SystemVars;
+		let sysVarsAny;
 		const start = 16393;
 
 		beforeEach(() => {
 			sysVars = new Zx81SystemVars();
 			sysVars.createDefaults();
+			sysVarsAny = sysVars as any;
 		});
 
 		it('getValues', () => {
@@ -109,7 +111,98 @@ describe('Zx81SystemVars', () => {
 				const membot = out.slice(84, 84 + 30);
 				assert.deepEqual(membot, input);
 			});
+		});
 
+		describe('getSysVarAtAddr', () => {
+			beforeEach(() => {
+				sysVars.setValuesFromArray(new Uint8Array([
+					0x00, // 0, VERSN
+					0x01, 0x00, // 1, E_PPC
+					0x34, 0x12, // 3, D_FILE
+					0x00, 0x00, // 5, DF_CC
+					0x00, 0x00, // 7, VARS
+					0x00, 0x00, // 9, DEST
+					0x001, 0x00, // 11, E_LINE
+					0x00, 0x00, // 13, CH_ADD
+					0x00, 0x00, // 15, X_PTR
+					0x002, 0x00, // 17, STKBOT
+					0x00, 0x00, // 19, STKEND
+					0x00, // 21, BREG
+					0x3D, 0x40, // 22, MEM
+					0x00, // 24, UNUSED1
+					0x02, // 25, DF_SZ
+					0x02, 0x00, // 26, S_TOP
+					0xBF, 0xFD, // 28, LAST_K
+					0x0F, // 30, DEBOUN
+					0x37, // 31, MARGIN
+					0x00, 0x00, // 32, NXTLIN (offset 32)
+					0x00, 0x00, // 34, OLDPPC
+					0x00, // 36, FLAGX
+					0x00, 0x00, // 37, STRLEN
+					0x8D, 0x0C, // 39, T_ADDR
+					0x00, 0x00, // 41, SEED
+					0xA3, 0xF5, // 43, FRAMES
+					0x00, 0x00, // 45, COORDS
+					0xBC, // 47, PR_CC
+					0x78, 0x56, // 48, S_POSN
+					0x40, // 50, CDFLAG
+					...Array(32).fill(0), // 51, PRBUFF (32 spaces)
+					0x76, // Newline
+					...Array(30).fill(0), // 84, MEMBOT (30 zeros)
+					0x00, 0x00 // 114, UNUSED2
+				]));
+			});
+
+			it('address name', () => {
+				assert.equal(sysVarsAny.getSysVarAtAddr("D_FILE"), 0x1234);
+				assert.equal(sysVarsAny.getSysVarAtAddr("S_POSN"), 0x5678);
+				assert.equal(sysVarsAny.getSysVarAtAddr("16396"), 0x1234);
+				assert.equal(sysVarsAny.getSysVarAtAddr("16441"), 0x5678);
+			});
+
+			it('address number', () => {
+				assert.equal(sysVarsAny.getSysVarAtAddr(16396), 0x1234);
+				assert.equal(sysVarsAny.getSysVarAtAddr(16441), 0x5678);
+			});
+		});
+
+		describe('compare', () => {
+			beforeEach(() => {
+				const arr = new Uint8Array(116);
+				arr.fill(0x11)
+				sysVars.setValuesFromArray(arr);
+			});
+
+			it('skipNames', () => {
+				const other = new Uint8Array(116);
+				other.fill(0x22);
+				const diffs = sysVars.compare(other);
+				assert.equal(diffs.get("D_FILE"), undefined);
+				assert.equal(diffs.get("DF_CC"), undefined);
+				assert.equal(diffs.get("VARS"), undefined);
+				assert.equal(diffs.get("E_LINE"), undefined);
+				assert.equal(diffs.get("CH_ADD"), undefined);
+				assert.equal(diffs.get("STKBOT"), undefined);
+				assert.equal(diffs.get("STKEND"), undefined);
+				assert.equal(diffs.get("NXTLIN"), undefined);
+			});
+
+			it('all diff', () => {
+				const other = new Uint8Array(116);
+				other.fill(0x22);
+				const diffs = sysVars.compare(other);
+				assert.deepEqual(diffs.get("S_POSN"), new Uint8Array([0x22, 0x22]));
+				assert.equal(diffs.get("16441"), undefined);
+				assert.equal(diffs.size, 25);
+			});
+
+			it('1 diff', () => {
+				const other = new Uint8Array(sysVars.getValues());
+				other[25] = 255;	// DF_SZ
+				const diffs = sysVars.compare(other);
+				assert.deepEqual(diffs.get("DF_SZ"), new Uint8Array([255]));
+				assert.equal(diffs.size, 1);
+			});
 		});
 	});
 });
