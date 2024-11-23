@@ -28,7 +28,7 @@ export class Zx81PfileToBas {
 				// Line number
 				let lineNumber = buffer[index++] * 256;
 				lineNumber += buffer[index++];
-				txt += lineNumber.toString().padStart(4) + ' ';
+				txt += lineNumber.toString() + ' ';
 
 				// Length
 				let length = buffer[index++];

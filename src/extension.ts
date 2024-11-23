@@ -59,7 +59,8 @@ export function activate(context: vscode.ExtensionContext) {
     // Therefore, parameter 2 is ignored.
     context.subscriptions.push(vscode.commands.registerCommand('zx81-bastop.convertbastop', async (fileUri: vscode.Uri, _p2, outUri: vscode.Uri | undefined) => {
         //console.log(`zx81-bastop.convertbastop: file=${fileUri}, out=${outUri}`);
-        await convertBasToP(fileUri, outUri);
+        const result = await convertBasToP(fileUri, outUri);
+        return result;  // false if not successful (no p-file created)
     }));
 
     // Task provider for zx81-bastop.convertbastop
@@ -229,13 +230,23 @@ function getZx81BastopTask(task: vscode.Task): vscode.Task {
                     onDidWrite: writeEmitter.event,
                     onDidClose: closeEmitter.event,
                     open: async () => {
+                        let errMsg;
                         try {
-                            await vscode.commands.executeCommand('zx81-bastop.convertbastop', fileUri, undefined, outUri);
-                            writeEmitter.fire('Conversion complete.\r\n');
-                            closeEmitter.fire(0);
+                            const success = await vscode.commands.executeCommand('zx81-bastop.convertbastop', fileUri, undefined, outUri);
+                            if (!success)
+                                errMsg = 'Conversion failed.';
                         } catch (error) {
-                            writeEmitter.fire(`Conversion failed: ${error.message}\r\n`);
-                            closeEmitter.fire(1);
+                            errMsg = `Conversion failed: ${error.message}`
+                        }
+                        // Error?
+                        if (errMsg) {
+                            writeEmitter.fire(errMsg + '\r\n');
+                            closeEmitter.fire(1);   // Non-zero exit code
+                        }
+                        else {
+                            // No error
+                            writeEmitter.fire('Conversion complete.\r\n');
+                            closeEmitter.fire(0);   // Zero exit
                         }
                     },
                     close: () => {}

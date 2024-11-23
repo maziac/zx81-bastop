@@ -3,6 +3,7 @@
 # 1.2.0
 - Recognition loosened if shown float value is different to stored one
 - Right-click conversion to p file fixed.
+- The 'zx81-bastop.convertbastop' task now reports 1 in case of an error.
 
 # 1.1.1
 - Warnings added for problematic variables such as "LET PRINT=1".
