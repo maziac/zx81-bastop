@@ -396,12 +396,50 @@ describe('Zx81BasToPfile', () => {
 			}
 		});
 
-
 		it('regex tab', () => {
 			const conv = new Zx81BasToPfile(" MYTOKEN\t") as any;
 			assert.equal(conv.readToken(/^(T1|\sMYTOKEN\s)/), " MYTOKEN ");
 			assert.equal(conv.position, 9);
 			assert.equal(conv.colNr, 9);
+		});
+
+		it('RNDVAR', () => {
+			{
+				const conv = new Zx81BasToPfile("RND ") as any;
+				assert.equal(conv.readToken(conv.normalRegex), "RND");
+				assert.equal(conv.position, 3);
+				assert.equal(conv.colNr, 3);
+			}
+			{
+				const conv = new Zx81BasToPfile("RND(") as any;
+				assert.equal(conv.readToken(conv.normalRegex), "RND");
+				assert.equal(conv.position, 3);
+				assert.equal(conv.colNr, 3);
+			}
+			{
+				const conv = new Zx81BasToPfile("RND") as any;
+				assert.equal(conv.readToken(conv.normalRegex), "RND");
+				assert.equal(conv.position, 3);
+				assert.equal(conv.colNr, 3);
+			}
+			{
+				const conv = new Zx81BasToPfile("RNDVAR") as any;
+				assert.equal(conv.readToken(conv.normalRegex), "R");
+				assert.equal(conv.position, 1);
+				assert.equal(conv.colNr, 1);
+			}
+			{
+				const conv = new Zx81BasToPfile("PI") as any;
+				assert.equal(conv.readToken(conv.normalRegex), "PI");
+				assert.equal(conv.position, 2);
+				assert.equal(conv.colNr, 2);
+			}
+			{
+				const conv = new Zx81BasToPfile("PIT") as any;
+				assert.equal(conv.readToken(conv.normalRegex), "P");
+				assert.equal(conv.position, 1);
+				assert.equal(conv.colNr, 1);
+			}
 		});
 
 		it('remQuotedMap', () => {
@@ -959,6 +997,21 @@ describe('Zx81BasToPfile', () => {
 					0x41,	// INKEY$
 					0,		// SPACE
 					0x42,	// PI
+					0x76,	// Newline
+				]);
+			});
+
+			it('LET RNDVAR=RND', () => {
+				const conv = new Zx81BasToPfile("10 LET RNDVAR=RND") as any;
+				conv.encodeBasic();
+				const buf = conv.basicCodeOut;
+				assert.deepEqual(buf, [
+					0, 10,	// Line number
+					10, 0,	// Size
+					0xF1, // LET
+					0x37, 0x33, 0x29, 0x3B, 0x26, 0x37,	// RNDVAR
+					0x14,	// =
+					0x40,	// RND
 					0x76,	// Newline
 				]);
 			});

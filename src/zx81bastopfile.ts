@@ -171,21 +171,29 @@ export class Zx81BasToPfile extends EventEmitter {
 		//const sorted = [' ', '[PRINT]'];
 		const replaced = sorted.map(s => {
 			let res;
-			// Escape metacharacters
-			res = s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 
-			// Replace ' ' at start or end with '\s'
-			// For a few commands (those that do require parameters) the check does not include the \n.
-			// So e.g.
-			// 10 LET POKE = 60
-			// 20 GOSUB POKE
-			// would be converted correctly if the "GOSUB POKE" does not end
-			// on a space: "GOSUB POKE " would not be converted correctly.
-			// But "POKE " would be converted to 0xF4.
-			if (Zx81Tokens.tokensAllowingTrailingNl.includes(s))
-				res = res.replace(/ $/, '\\s');		// Allow also newline
-			else
-				res = res.replace(/ $/, '[ \t]');	// Don't allow newline
+			if (s === 'RND' || s === 'PI') {
+				// Tread RND and PI as special cases to avoid recognizing
+				// e.g. RND in RNDVAR as RND.
+				res = s + '\\b';
+			}
+			else {
+				// Escape metacharacters
+				res = s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+
+				// Replace ' ' at start or end with '\s'
+				// For a few commands (those that do require parameters) the check does not include the \n.
+				// So e.g.
+				// 10 LET POKE = 60
+				// 20 GOSUB POKE
+				// would be converted correctly if the "GOSUB POKE" does not end
+				// on a space: "GOSUB POKE " would not be converted correctly.
+				// But "POKE " would be converted to 0xF4.
+				if (Zx81Tokens.tokensAllowingTrailingNl.includes(s))
+					res = res.replace(/ $/, '\\s');		// Allow also newline
+				else
+					res = res.replace(/ $/, '[ \t]');	// Don't allow newline
+			}
 
 			return res;
 		});
