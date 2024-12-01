@@ -35,64 +35,17 @@ export class Zx81PfileToBas {
 				length += buffer[index++] * 256;
 				if (length > remaining)
 					throw Error('Invalid length of BASIC line: ' + length + ' at offset ' + index + '. Data exceeds buffer.');
+				if (length < 1)
+					throw Error('Invalid length of BASIC line: ' + length + ' at offset ' + index + '.');
 
-				// Read tokens
-				let rem = false;
-				let quoted = false;
-				let token = -1;
-				for (let i = 0; i < length - 1; i++) {
-					token = buffer[index++];
-
-					// Number?
-					if (!rem && !quoted && token === Zx81Tokens.NUMBER) {	// Number (is hidden)
-						// Get block of 5 bytes, the floating point number
-						const buf = buffer.slice(index, index + 5);
-						// Convert block to float
-						const value = this.convertBufToZx81Float(buf);
-						// Find digits belonging to the number
-						const txtNumberStr = this.getLastNumber(txt);
-						const txtNumber = parseFloat(txtNumberStr);
-						if (isNaN(txtNumber) || (Math.abs(txtNumber - value) > 1e-6)) {
-							// If digits are not the same as the value or they are not a real number then print the real value as comment
-							txt += '[#' + value + ']';
-						}
-						index += 5;
-						i += 5;
-						continue;
-					}
-
-					// Get token
-					let cvt = Zx81Tokens.convertToken(token);
-
-					// If REM or quoted then add brackets to commands
-					if ((bracketized || rem || quoted) && ((token >= 0xC1 && token !== 0xC3) || (token >= 0x40 && token <= 0x42)))
-						cvt = '[' + cvt.trim() + ']';
-					txt += cvt;
-
-					// Check for REM
-					if (i == 0 && token === Zx81Tokens.REM) {
-						rem = true;
-					}
-					// Check for quoted text
-					else if (token === Zx81Tokens.QUOTE) {
-						quoted = !quoted;
-					}
-				}
-
-				// In case a REM line ends with a space, then exchange it with
-				// [0] to prevent that trailing spaces are removed by an editor.
-				if (rem && token === Zx81Tokens.SPACE)
-					txt = txt.slice(0, -1) + '[0]';
-
-				// Line should end with a new line
-				const lastToken = buffer[index++];
-				if (lastToken !== Zx81Tokens.NEWLINE) {
-					//txt += `[${lastToken}]\n`; For Ant Attack this produces a problem.
-					txt += '# Note: Previous line did not end with 118 (END token) but with ' + lastToken + '.';
-				}
+				// Read tokens for a BASIC line
+				const lineBuf = buffer.slice(index, index + length);
+				const lineText = this.convertBasLine(lineBuf, bracketized);
+				txt += lineText;
 
 				// Next
 				remaining -= 4 + length;
+				index += length;
 				txt += '\n';
 			}
 
@@ -104,6 +57,71 @@ export class Zx81PfileToBas {
 			// Put any errors after the text
 			txt += '\n\n# Error: ' + e.message + '\n';
 		}
+		return txt;
+	}
+
+
+	/** Converts one BYSIC line into text.
+	 * @param buffer The data of the BASIC line.
+	 * @param bracketized If true then tokens are put in brackets.
+	 * @returns The text of the BASIC line.
+	 */
+	public static convertBasLine(buffer: Uint8Array, bracketized = false): string {
+		let txt = '';
+		let rem = false;
+		let quoted = false;
+		let token = -1;
+		const length = buffer.length - 1;
+		for (let i = 0; i < length ; i++) {
+			token = buffer[i];
+
+			// Number?
+			if (!rem && !quoted && token === Zx81Tokens.NUMBER) {	// Number (is hidden)
+				// Get block of 5 bytes, the floating point number
+				const buf = buffer.slice(i, i + 5);
+				// Convert block to float
+				const value = this.convertBufToZx81Float(buf);
+				// Find digits belonging to the number
+				const txtNumberStr = this.getLastNumber(txt);
+				const txtNumber = parseFloat(txtNumberStr);
+				if (isNaN(txtNumber) || (Math.abs(txtNumber - value) > 1e-6)) {
+					// If digits are not the same as the value or they are not a real number then print the real value as comment
+					txt += '[#' + value + ']';
+				}
+				i += 5;
+				continue;
+			}
+
+			// Get token
+			let cvt = Zx81Tokens.convertToken(token);
+
+			// If REM or quoted then add brackets to commands
+			if ((bracketized || rem || quoted) && ((token >= 0xC1 && token !== 0xC3) || (token >= 0x40 && token <= 0x42)))
+				cvt = '[' + cvt.trim() + ']';
+			txt += cvt;
+
+			// Check for REM
+			if (i == 0 && token === Zx81Tokens.REM) {
+				rem = true;
+			}
+			// Check for quoted text
+			else if (token === Zx81Tokens.QUOTE) {
+				quoted = !quoted;
+			}
+		}
+
+		// In case a REM line ends with a space, then exchange it with
+		// [0] to prevent that trailing spaces are removed by an editor.
+		if (rem && token === Zx81Tokens.SPACE)
+			txt = txt.slice(0, -1) + '[0]';
+
+		// Line should end with a new line
+		const lastToken = buffer[length];
+		if (lastToken !== Zx81Tokens.NEWLINE) {
+			//txt += `[${lastToken}]\n`; For Ant Attack this produces a problem.
+			txt += '# Note: Previous line did not end with 118 (END token) but with ' + lastToken + '.';
+		}
+
 		return txt;
 	}
 

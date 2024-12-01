@@ -1,6 +1,4 @@
-
-
-
+/** The ZX81 BASIC tokens. */
 export class Zx81Tokens {
 	// A few often needed constants
 	public static readonly SPACE = 0;
