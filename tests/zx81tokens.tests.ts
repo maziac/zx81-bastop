@@ -4,6 +4,15 @@ import {Zx81Tokens} from '../src/zx81tokens';
 /** Tests the ZX81 P file converter.
  */
 describe('Zx81Tokens', () => {
+	describe('convertBasLine', () => {
+		it('not ending with NEWLINE', () => {
+			assert.equal(Zx81Tokens.convertBasLine(new Uint8Array([255])), '# Note: Previous line did not end with 118 (END token) but with 255.');
+		});
+		it('REM', () => {
+			assert.equal(Zx81Tokens.convertBasLine(new Uint8Array([0xEA, 0x26, 0x27, 0x28, 0x76])), 'REM ABC');
+		});
+	});
+
 	describe('getLastNumber', () => {
 		it('empty string', () => {
 			assert.equal((Zx81Tokens as any).getLastNumber(''), '');
