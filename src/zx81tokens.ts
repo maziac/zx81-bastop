@@ -102,7 +102,7 @@ export class Zx81Tokens {
 			// Number?
 			if (!rem && !quoted && token === Zx81Tokens.NUMBER) {	// Number (is hidden)
 				// Get block of 5 bytes, the floating point number
-				const buf = buffer.slice(i, i + 5);
+				const buf = buffer.slice(i + 1, i + 6);
 				// Convert block to float
 				const value = this.convertBufToZx81Float(buf);
 				// Find digits belonging to the number
@@ -143,7 +143,7 @@ export class Zx81Tokens {
 		const lastToken = buffer[length];
 		if (lastToken !== Zx81Tokens.NEWLINE) {
 			//txt += `[${lastToken}]\n`; For Ant Attack this produces a problem.
-			txt += '# Note: Previous line did not end with 118 (END token) but with ' + lastToken + '.';
+			txt += '# Note: Line did not end with 118 (END token) but with ' + lastToken + '.';
 		}
 
 		return txt;
@@ -172,7 +172,6 @@ export class Zx81Tokens {
 		let found = '';
 		txt = txt.toUpperCase();
 		let expFound = 0;
-		let expectingExponent = false;
 		let k = txt.length - 1;
 		while (k >= 0) {
 			const c = txt[k];

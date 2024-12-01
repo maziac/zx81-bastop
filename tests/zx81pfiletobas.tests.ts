@@ -103,7 +103,7 @@ describe('Zx81PfileToBas', () => {
 				0xEA,	// REM
 			];
 			const txt = Zx81PfileToBas.getZx81BasicText(new Uint8Array(p1));
-			assert.ok(txt.includes('line did not end with 118'));
+			assert.ok(txt.includes('Line did not end with 118'));
 		});
 	});
 });

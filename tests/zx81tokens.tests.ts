@@ -6,7 +6,7 @@ import {Zx81Tokens} from '../src/zx81tokens';
 describe('Zx81Tokens', () => {
 	describe('convertBasLine', () => {
 		it('not ending with NEWLINE', () => {
-			assert.equal(Zx81Tokens.convertBasLine(new Uint8Array([255])), '# Note: Previous line did not end with 118 (END token) but with 255.');
+			assert.equal(Zx81Tokens.convertBasLine(new Uint8Array([255])), '# Note: Line did not end with 118 (END token) but with 255.');
 		});
 		it('REM', () => {
 			assert.equal(Zx81Tokens.convertBasLine(new Uint8Array([0xEA, 0x26, 0x27, 0x28, 0x76])), 'REM ABC');
