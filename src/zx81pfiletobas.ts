@@ -40,7 +40,7 @@ export class Zx81PfileToBas {
 
 				// Read tokens for a BASIC line
 				const lineBuf = buffer.slice(index, index + length);
-				const lineText = this.convertBasLine(lineBuf, bracketized);
+				const lineText = Zx81Tokens.convertBasLine(lineBuf, bracketized);
 				txt += lineText;
 
 				// Next
@@ -57,71 +57,6 @@ export class Zx81PfileToBas {
 			// Put any errors after the text
 			txt += '\n\n# Error: ' + e.message + '\n';
 		}
-		return txt;
-	}
-
-
-	/** Converts one BYSIC line into text.
-	 * @param buffer The data of the BASIC line.
-	 * @param bracketized If true then tokens are put in brackets.
-	 * @returns The text of the BASIC line.
-	 */
-	public static convertBasLine(buffer: Uint8Array, bracketized = false): string {
-		let txt = '';
-		let rem = false;
-		let quoted = false;
-		let token = -1;
-		const length = buffer.length - 1;
-		for (let i = 0; i < length ; i++) {
-			token = buffer[i];
-
-			// Number?
-			if (!rem && !quoted && token === Zx81Tokens.NUMBER) {	// Number (is hidden)
-				// Get block of 5 bytes, the floating point number
-				const buf = buffer.slice(i, i + 5);
-				// Convert block to float
-				const value = this.convertBufToZx81Float(buf);
-				// Find digits belonging to the number
-				const txtNumberStr = this.getLastNumber(txt);
-				const txtNumber = parseFloat(txtNumberStr);
-				if (isNaN(txtNumber) || (Math.abs(txtNumber - value) > 1e-6)) {
-					// If digits are not the same as the value or they are not a real number then print the real value as comment
-					txt += '[#' + value + ']';
-				}
-				i += 5;
-				continue;
-			}
-
-			// Get token
-			let cvt = Zx81Tokens.convertToken(token);
-
-			// If REM or quoted then add brackets to commands
-			if ((bracketized || rem || quoted) && ((token >= 0xC1 && token !== 0xC3) || (token >= 0x40 && token <= 0x42)))
-				cvt = '[' + cvt.trim() + ']';
-			txt += cvt;
-
-			// Check for REM
-			if (i == 0 && token === Zx81Tokens.REM) {
-				rem = true;
-			}
-			// Check for quoted text
-			else if (token === Zx81Tokens.QUOTE) {
-				quoted = !quoted;
-			}
-		}
-
-		// In case a REM line ends with a space, then exchange it with
-		// [0] to prevent that trailing spaces are removed by an editor.
-		if (rem && token === Zx81Tokens.SPACE)
-			txt = txt.slice(0, -1) + '[0]';
-
-		// Line should end with a new line
-		const lastToken = buffer[length];
-		if (lastToken !== Zx81Tokens.NEWLINE) {
-			//txt += `[${lastToken}]\n`; For Ant Attack this produces a problem.
-			txt += '# Note: Previous line did not end with 118 (END token) but with ' + lastToken + '.';
-		}
-
 		return txt;
 	}
 
@@ -230,62 +165,6 @@ export class Zx81PfileToBas {
 		}
 
 		return hdr;
-	}
-
-
-	/** Converts a ZX81 float number in a buffer into a float.
-	 * @param buf The 5 elements buffer with the ZX81 float number.
-	 * @returns The float number.
-	 */
-	protected static convertBufToZx81Float(buf: Uint8Array): number {
-		if (buf.length !== 5)
-			throw Error("Expected 5 bytes for a ZX81 float number.");
-		const exponent = buf[0] - 129;
-		const mantissa = (buf[1] << 24) + (buf[2] << 16) + (buf[3] << 8) + buf[4];
-		const value = (mantissa / 0x80000000 + 1) * Math.pow(2, exponent);
-		return value;
-	}
-
-
-	/** Searches from the end of the text for the last number.
-	 * @param txt The text to search in.
-	 * @returns The last number found as string. Empty string if nothing found.
-	 */
-	protected static getLastNumber(txt: string): string {
-		let found = '';
-		txt = txt.toUpperCase();
-		let expFound = 0;
-		let expectingExponent = false;
-		let k = txt.length - 1;
-		while (k >= 0) {
-			const c = txt[k];
-			if (c >= '0' && c <= '9' || c === '.') {
-				found = c + found;
-			}
-			else if (c === 'E') {
-				if (expFound > 0)
-					break;	// Exponent already found
-				expFound++;
-				found = c + found;
-			}
-			else if (c === '+' || c === '-') {
-				if (expFound > 0)
-					break;	// Other than exponent, no +/- allowed
-				// A 'E' is expected before the sign.
-				k--;
-				if (k < 0)
-					break;	// String ended
-				if (txt[k] !== 'E')
-					break;	// No 'E' so strings ends without sign.
-				expFound++;
-				found = 'E' + c + found;
-			}
-			else
-				break;
-			// Next
-			k--;
-		}
-		return found;
 	}
 
 

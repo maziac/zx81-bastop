@@ -1,6 +1,7 @@
 import * as assert from 'assert';
 import {Zx81PfileToBas} from '../src/zx81pfiletobas';
 import {Zx81BasToPfile} from '../src/zx81bastopfile';
+import {Zx81Tokens} from '../src/zx81tokens';
 
 
 /** Tests converting zX81 BASIC program and p-file back and forth.
@@ -361,7 +362,7 @@ describe('Zx81 Cross Conversion', () => {
 			const f1 = value;
 			const conv = new Zx81BasToPfile('') as any;
 			const f1Buf = conv.getZx81Float(f1);
-			const f2 = (Zx81PfileToBas as any).convertBufToZx81Float(f1Buf);
+			const f2 = (Zx81Tokens as any).convertBufToZx81Float(f1Buf);
 			const tolerance = 1e-10;
 			assert.ok(Math.abs(f2 - f1) < tolerance, `Expected ${f1} but got ${f2}`);
 		}
