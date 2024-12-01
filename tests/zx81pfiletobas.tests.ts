@@ -17,7 +17,7 @@ describe('Zx81PfileToBas', () => {
 				0xEA,	// REM
 				0x76	// Newline
 			]));
-			assert.equal(txt, '   1 REM \n');
+			assert.equal(txt, '1 REM \n');
 		});
 		it('3 empty REM', () => {
 			const txt = Zx81PfileToBas.getZx81BasicText(Uint8Array.from([
@@ -36,7 +36,7 @@ describe('Zx81PfileToBas', () => {
 				0xEA,	// REM
 				0x76	// Newline
 			]));
-			assert.equal(txt, '  10 REM \n  11 REM \n9999 REM \n');
+			assert.equal(txt, '10 REM \n11 REM \n9999 REM \n');
 		});
 		it('REM with 1 trailing space', () => {
 			const txt = Zx81PfileToBas.getZx81BasicText(Uint8Array.from([
@@ -46,7 +46,7 @@ describe('Zx81PfileToBas', () => {
 				0,
 				0x76	// Newline
 			]));
-			assert.equal(txt, '   1 REM [0]\n');
+			assert.equal(txt, '1 REM [0]\n');
 		});
 		it('REM with 3 trailing space', () => {
 			const txt = Zx81PfileToBas.getZx81BasicText(Uint8Array.from([
@@ -56,7 +56,7 @@ describe('Zx81PfileToBas', () => {
 				0, 0, 0,
 				0x76	// Newline
 			]));
-			assert.equal(txt, '   1 REM   [0]\n');
+			assert.equal(txt, '1 REM   [0]\n');
 		});
 	});
 

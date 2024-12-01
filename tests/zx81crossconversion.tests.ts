@@ -328,20 +328,28 @@ describe('Zx81 Cross Conversion', () => {
 				}
 			});
 			it('all codes, alltogether', () => {
-				const p1 = [
-					0, 1, 	// Line number
-					249, 0,	// Length
-					0xFF,	// COPY
-				];
+				const p1Contents:number[] = [];
+				p1Contents.push(0xFF);	// COPY
 				for (let i = 0; i < 256; i++) {
+					//for (let i = 0; i < 256; i++) {
 					if (i === 0x0B || (i >= 0x1C && i <= 0x25) || i === 0x7E)	// Exclude quotes and digits and number
 						continue;
-					p1.push(i);
+					p1Contents.push(i);
+
 					// Avoid ambiguous characters, e.g. ">", "="
 					if(i >= 0x12 && i <= 0x14)
-						p1.push(0);	// Add space
+						p1Contents.push(0);	// Add space
+					// Also for ambiguous RND and PI
+					if (i === 0x40 || i === 0x42)
+						p1Contents.push(0);	// Add space
 				}
-				p1.push(0x76);	// Newline
+				p1Contents.push(0x76);	// Newline
+				// Concatenate
+				const p1 = [
+					0, 1, 	// Line number
+					p1Contents.length, 0, 	// Length
+					...p1Contents
+				];
 				compareP1WithP2(p1);
 			});
 		});
