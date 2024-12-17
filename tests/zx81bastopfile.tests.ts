@@ -1016,7 +1016,7 @@ describe('Zx81BasToPfile', () => {
 				]);
 			});
 
-			it('"', () => {
+			it('inverse "', () => {
 				const conv = new Zx81BasToPfile(
 					'10 PLOT %"') as any;
 				conv.encodeBasic();
@@ -1025,7 +1025,23 @@ describe('Zx81BasToPfile', () => {
 					0, 10,	// Line number
 					3, 0,	// Size
 					0xF6,	// PLOT
-					139,	// \"
+					0x8B,	// \"
+					0x76,	// Newline
+				]);
+			});
+
+			it('inverse " in quoted string', () => {
+				const conv = new Zx81BasToPfile(
+					'10 PRINT "%""') as any;
+				conv.encodeBasic();
+				const buf = conv.basicCodeOut;
+				assert.deepEqual(buf, [
+					0, 10,	// Line number
+					5, 0,	// Size
+					0xF5,	// PLOT
+					0x0B,	// "
+					0x8B,	// %" (inverted ")
+					0x0B,	// "
 					0x76,	// Newline
 				]);
 			});

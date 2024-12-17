@@ -100,7 +100,7 @@ export class Zx81BasToPfile extends EventEmitter {
 			this.str += '\n';
 
 		// Create map for REM and quoted strings decoding
-		for (let i = 0; i < Zx81Tokens.tokens.length; i++) {
+		for (let i = 0; i < 256; i++) {
 			let key = Zx81Tokens.convertToken(i);
 			this.normalMap.set(key, i);
 			if ((i >= 0xC1 && i !== 0xC3) || (i >= 0x40 && i <= 0x42)) {

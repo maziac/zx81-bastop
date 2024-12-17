@@ -12,10 +12,6 @@ describe('Zx81Tokens', () => {
 			assert.equal(Zx81Tokens.convertBasLine(new Uint8Array([0xEA, 0x26, 0x27, 0x28, 0x76])), 'REM ABC');
 		});
 		it('Quoted string with quotes, PRINT "A\"B\"C"', () => {
-
-			const x = Zx81Tokens.tokens[0xc0];
-			const l = x.length;
-			console.log(x);
 			assert.equal(Zx81Tokens.convertBasLine(new Uint8Array([0xF5, 0x0B, 0x26, 0xC0, 0x27, 0xC0, 0x28, 0x0B, 0x76])), `PRINT "A\\\"B\\\"C"`);
 		});
 	});
