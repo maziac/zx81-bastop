@@ -349,16 +349,22 @@ export class Zx81BasToPfile extends EventEmitter {
 
 
 	// Reads a 'normal' BASIC line.
-	// Returns undefined if no REM line is found.
 	// Reads including the newline.
-	public readNormal(): number[] {
+	public readNormal(): [number[], boolean] {
 		const buffer: number[] = [];
+		let finished = false;
 		while (true) {
 			// Skip any \
 			this.readRegex(this.contRegex);
 			// End?
-			if (this.testReadChar() === '\n')
+			if (this.testReadChar() === '\n') {
+				finished = true;
+				// New line
+				this.position++;
+				this.colNr = 0;
+				this.lineNr++;
 				break;
+			}
 			// Check for quoted string
 			const buf = this.readQuotedString();
 			if (buf) {
@@ -386,14 +392,13 @@ export class Zx81BasToPfile extends EventEmitter {
 			// Add to buffer
 			const tokenNumber = this.normalMapGet(token);
 			buffer.push(tokenNumber);
+
+			// Return on 'THEN'
+			if (tokenNumber === Zx81Tokens.THEN)
+				break;
 		}
 
-		// New line
-		this.position++;
-		this.colNr = 0;
-		this.lineNr++;
-
-		return buffer;
+		return [buffer, finished];
 	}
 
 
@@ -401,7 +406,7 @@ export class Zx81BasToPfile extends EventEmitter {
 	 * If it is a problematic name, a warning is shown.
 	 * Problematic names are names that are same as a BASIC command.
 	 */
-	protected checkVariableName() {
+	protected getVariableName(): number[] {
 		this.regexVariableName.lastIndex = this.position;
 		const result = this.regexVariableName.exec(this.str);
 		if (!result)
@@ -414,7 +419,9 @@ export class Zx81BasToPfile extends EventEmitter {
 			const colNr = this.colNr + trailingSpaces.length;
 			this.showWarning("Variable name '" + varName + "' is same as a BASIC command. This may or may not be a problem. To be on the safe side better rename it.", this.lineNr, colNr);
 		}
-		return;
+		this.position += varName.length;
+		const buf = Array.from(varName).map(c => this.normalMapGet(c));
+		return buf;
 	}
 
 
@@ -815,28 +822,40 @@ export class Zx81BasToPfile extends EventEmitter {
 			// Skip spaces
 			this.skipSpacesAndCont();
 
-			// Check for first command
-			const token = this.readToken(this.commandRegex);
-			if (!token)
-				this.throwError("Unknown command");
-			const tokenNumber = this.commandMapGet(token);
-			this.basicCodeOut.push(tokenNumber);
-			// Check for DiM or LET
-			if (tokenNumber === Zx81Tokens.DIM || tokenNumber === Zx81Tokens.LET) {
-				// DIM/LET: Check for variable name to give an additional warning
-				this.checkVariableName();
-				// Otherwise handle as other requests
-			}
-			// Check for REM
-			if (tokenNumber === Zx81Tokens.REM) {
-				// REM
-				const buf = this.readRem();
-				this.basicCodeOut.push(...buf);
-			}
-			else {
+			// Loop parts separated by 'THEN'
+			while (true) {
+				// Check for first command
+				const token = this.readToken(this.commandRegex);
+				if (!token)
+					this.throwError("Unknown command");
+				const tokenNumber = this.commandMapGet(token);
+				this.basicCodeOut.push(tokenNumber);
+
+				// Check for REM
+				if (tokenNumber === Zx81Tokens.REM) {
+					// REM
+					const buf = this.readRem();
+					this.basicCodeOut.push(...buf);
+					break;
+				}
+
+				// Treat characters after DIM or LET special
+				if (tokenNumber === Zx81Tokens.DIM || tokenNumber === Zx81Tokens.LET) {
+					// Get the variable name and check it
+					const buf = this.getVariableName();
+					this.basicCodeOut.push(...buf);
+				}
+
 				// Check for other tokens
-				const buf = this.readNormal();
+				const [buf, finished] = this.readNormal();
 				this.basicCodeOut.push(...buf);
+
+				// End?
+				if (finished)
+					break;
+
+				// Skip spaces
+				this.skipSpacesEtc();
 			}
 
 			// End line

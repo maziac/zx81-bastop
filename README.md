@@ -24,7 +24,6 @@ You can use this tool for:
 There is also a viewer for P-Files included that shows the system variables, the BASIC code (in both hex and BASIC text), the DFILE (screen) area, and the BASIC variables area.
 
 # Installation
-
 Install through the Visual Studio Code Marketplace. The extension is called "ZX81 BASIC to P-File Converter" (zx81-bastop).
 
 # Usage

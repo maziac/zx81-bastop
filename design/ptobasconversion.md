@@ -146,11 +146,10 @@ Important things to note:
   Here are some examples for otherwise ambiguous strings: <>, <=, >=, **, RND, INKEY$, PI, AT to COPY
 
 ## Variable names
-A problem still remains that could not be 100% solved without a full BASIC interpreter are the names of some variables.
-If you choose a variable name that happens to be the same as a ZX81 command or function this can prevent the program from being correctly converted into a pfile.
-Especially if you already converted from a .p file to .bas and back to .p it can happen that the .p file is not working anymore.
-Most likely this is because of ambiguous variable names.
-Example:
+A remaining issue that cannot be fully resolved without a complete BASIC interpreter is the naming of some variables.
+If you choose a variable name that coincides with a ZX81 command or function, it may prevent the program from being correctly converted into a .p file.
+This issue is particularly likely to occur if you have already converted from a .p file to a .bas file and back to a .p file, resulting in a non-functional .p file.
+The most probable cause is ambiguous variable names. For example:
 ~~~basic
 10 LET POKE = 60
 20 GOSUB POKE
