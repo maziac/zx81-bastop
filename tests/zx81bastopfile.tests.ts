@@ -1084,13 +1084,13 @@ describe('Zx81BasToPfile', () => {
 
 			it('AT - COPY', () => {
 				const conv = new Zx81BasToPfile(
-					'10 PLOT AT TAB CODE VAL LEN SIN COS TAN ASN ACS ATN LN EXP INT SQR SGN ABS PEEK USR STR$ CHR$ NOT ** OR  AND <=>=<> THEN  TO  STEP LPRINT LLIST STOP SLOW FAST NEW SCROLL CONT DIM REM FOR GOTO GOSUB INPUT LOAD LIST LET PAUSE NEXT POKE PRINT PLOT RUN SAVE RAND IF CLS UNPLOT CLEAR RETURN COPY '
+					'10 PLOT AT TAB CODE VAL LEN SIN COS TAN ASN ACS ATN LN EXP INT SQR SGN ABS PEEK USR STR$ CHR$ NOT ** OR  AND <=>=<> TO  STEP LPRINT LLIST STOP SLOW FAST NEW SCROLL CONT DIM REM FOR GOTO GOSUB INPUT LOAD LIST  THEN PLOT LET PAUSE NEXT POKE PRINT PLOT RUN SAVE RAND IF CLS UNPLOT CLEAR RETURN COPY '
 				) as any;
 				conv.encodeBasic();
 				const buf = conv.basicCodeOut;
 				assert.deepEqual(buf, [
 					0, 10,	// Line number
-					64, 0,	// Size
+					65, 0,	// Size
 					0xF6,	// PLOT
 					193,	// AT
 					194,	// TAB
@@ -1098,9 +1098,9 @@ describe('Zx81BasToPfile', () => {
 					197, 198, 199, 200, 201, 202, 203, 204,
 					205, 206, 207, 208, 209, 210, 211, 212,
 					213, 214, 215, 216, 217, 218, 219, 220,
-					221, 222, 223, 224, 225, 226, 227, 228,
+					221, 223, 224, 225, 226, 227, 228,
 					229, 230, 231, 232, 233, 234, 235, 236,
-					237, 238, 239, 240, 241, 242, 243, 244,
+					237, 238, 239, 240, 0xDE, 0xF6, 241, 242, 243, 244,
 					245, 246, 247, 248, 249, 250, 251, 252,
 					253, 254,
 					255,	// COPY
@@ -1674,7 +1674,7 @@ describe('Zx81BasToPfile', () => {
 	});
 
 
-	describe('checkVariableName', () => {
+	describe('getVariableName', () => {
 			it('DIM 1', () => {
 				const conv = new Zx81BasToPfile("10 DIM  PRINT(100)") as any;
 				conv.position = 7;
@@ -1687,7 +1687,7 @@ describe('Zx81BasToPfile', () => {
 					assert.equal(col, 8);
 					warningsCount++;
 				});
-				conv.checkVariableName();
+				conv.getVariableName();
 				assert.equal(warningsCount, 1);
 			});
 			it('DIM 2', () => {
@@ -1702,7 +1702,7 @@ describe('Zx81BasToPfile', () => {
 					assert.equal(col, 7);
 					warningsCount++;
 				});
-				conv.checkVariableName();
+				conv.getVariableName();
 				assert.equal(warningsCount, 1);
 			});
 			it('LET', () => {
@@ -1717,7 +1717,7 @@ describe('Zx81BasToPfile', () => {
 					assert.equal(col, 7);
 					warningsCount++;
 				});
-				conv.checkVariableName();
+				conv.getVariableName();
 				assert.equal(warningsCount, 1);
 			});
 		it('not found', () => {
@@ -1727,7 +1727,7 @@ describe('Zx81BasToPfile', () => {
 			conv.colNr = 7;
 			let warningsCount = 0;;
 			conv.on('warning', msg => {warningsCount++});
-			conv.checkVariableName();
+			conv.getVariableName();
 			assert.equal(warningsCount, 0);
 		});
 	});

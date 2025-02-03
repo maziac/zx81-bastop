@@ -2,6 +2,7 @@ import * as assert from 'assert';
 import {Zx81PfileToBas} from '../src/zx81pfiletobas';
 import {Zx81BasToPfile} from '../src/zx81bastopfile';
 import {Zx81Tokens} from '../src/zx81tokens';
+import {queryObjects} from 'v8';
 
 
 /** Tests converting zX81 BASIC program and p-file back and forth.
@@ -315,8 +316,9 @@ describe('Zx81 Cross Conversion', () => {
 					0,
 					0x76	// Newline
 				];
-				for (let i = 0; i < 256; i++) {
-					if (i === 0x0B || (i >= 0x1C && i <= 0x25) || i === 0x7E)	// Exclude quotes and digits and number
+				for (let i = 0; i < 256; i++)
+				{
+					if (i === Zx81Tokens.QUOTE || (i >= 0x1C && i <= 0x25) || i === Zx81Tokens.NUMBER || i === Zx81Tokens.THEN)	// Exclude quotes and digits and number and THEN
 						continue;
 					p1[5] = i;
 					try {
@@ -332,8 +334,7 @@ describe('Zx81 Cross Conversion', () => {
 				const p1Contents:number[] = [];
 				p1Contents.push(0xFF);	// COPY
 				for (let i = 0; i < 256; i++) {
-					//for (let i = 0; i < 256; i++) {
-					if (i === 0x0B || (i >= 0x1C && i <= 0x25) || i === 0x7E)	// Exclude quotes and digits and number
+					if (i === Zx81Tokens.QUOTE || (i >= 0x1C && i <= 0x25) || i === Zx81Tokens.NUMBER || i === Zx81Tokens.THEN)	// Exclude quotes and digits and number and THEN
 						continue;
 					p1Contents.push(i);
 
