@@ -1108,6 +1108,58 @@ describe('Zx81BasToPfile', () => {
 				]);
 			});
 
+			describe('THEN', () => {
+				it('1 IF N=2 THEN LET A=0', () => {
+					const conv = new Zx81BasToPfile("1 IF N=M THEN LET A=B") as any;
+					conv.encodeBasic();
+					const buf = conv.basicCodeOut;
+					assert.deepEqual(buf, [
+						0, 1,	// Line number
+						10, 0,	// Size
+						0xFA,	// IF
+						0x33,	// N
+						0x14,	// =
+						0x32,	// M
+						0xDE,	// THEN
+						0xF1,	// LET
+						0x26,	// A
+						0x14,	// =
+						0x27,	// B
+						0x76,	// Newline
+					]);
+				});
+				it('exception: "1 IF N=2 THEN "', () => {
+					const conv = new Zx81BasToPfile("1 IF N=M THEN ") as any;
+					assert.throws(() => {
+						conv.encodeBasic();
+					});
+				});
+				it('no exception: "1 IF N=2 THEN"', () => {
+					const conv = new Zx81BasToPfile("1 IF N=M THEN") as any;
+					conv.encodeBasic();
+					const buf = conv.basicCodeOut;
+					assert.deepEqual(buf, [
+						0, 1,	// Line number
+						10, 0,	// Size
+						0xFA,	// IF
+						0x33,	// N
+						0x14,	// =
+						0x32,	// M
+						0,		// SPACE
+						0x39,	// T
+						0x2D,	// H
+						0x2A,	// E
+						0x33,	// N
+						0x76,	// Newline
+					]);
+				});
+				it('exception: "1 IF N=2 THEN THEN"', () => {
+					const conv = new Zx81BasToPfile("1 IF N=M THEN THEN") as any;
+					assert.throws(() => {
+						conv.encodeBasic();
+					});
+				});
+			});
 
 			describe('special codes', () => {
 				describe('quoted string', () => {
