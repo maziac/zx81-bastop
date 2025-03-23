@@ -126,12 +126,12 @@ function addStandardHeader() {
 	let html = '<span>File size: ' + fileSize + ' Bytes' + humanString + ', </span>';
 
 	// Used parser
-	let i = filePathParser.lastIndexOf('/');
-	const k = filePathParser.lastIndexOf('\\');
+	let i = filePathParser!.lastIndexOf('/');
+	const k = filePathParser!.lastIndexOf('\\');
 	if (k > i)
 		i = k;
 	i++;
-	const usedParser = filePathParser.substring(i);
+	const usedParser = filePathParser!.substring(i);
 	html += '<span>Parser used: <a href="#" onclick="openCustomParser()">' + usedParser + '</a></span>';
 
 	standardHeaderNode.innerHTML = html;
